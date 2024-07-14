@@ -1,7 +1,6 @@
 package app.workive.api.user.service;
 
 import app.workive.api.auth.domain.AuthUserDetails;
-import app.workive.api.auth.exception.UserAlreadyActivatedException;
 import app.workive.api.organization.domain.entity.Organization;
 import app.workive.api.user.domain.UserRole;
 import app.workive.api.user.domain.UserStatus;
@@ -22,9 +21,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -41,16 +37,13 @@ public class UserService {
         }
     }
 
-    public UserResponse getUser(long organizationId, long userId) throws UserNotFoundException {
-        var user = getById(organizationId, userId);
-        return userMapper.toUserResponse(user);
+    public User getUser(long organizationId, long userId) throws UserNotFoundException {
+        return getById(organizationId, userId);
     }
 
-    public UserResponse getUserByEmail(String email) throws UserNotFoundException {
-        var user = userRepository.findByEmail(email)
+    public User getUserByEmail(String email) throws UserNotFoundException {
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
-
-        return userMapper.toUserResponse(user);
     }
 
     public UserDetails getUserDetails(Long id) throws UserNotFoundException {
@@ -58,13 +51,6 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(null));
 
         return AuthUserDetails.build(user);
-    }
-
-
-
-    public List<UserResponse> getSiteUsers(Long organizationId) {
-        var users = userRepository.findByOrganizationId(organizationId);
-        return userMapper.toUserResponses(users);
     }
 
     @Transactional
@@ -83,7 +69,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse createSiteUser(Long organizationId, UserCreateRequest request)
+    public UserResponse createUser(Long organizationId, UserCreateRequest request)
             throws UserAlreadyExistsException {
         checkIfUserExists(request.getEmail());
         var user = buildUser(
@@ -99,7 +85,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse partiallyUpdateUser(Long organizationId, Long userId, UserUpdateRequest request) throws UserNotFoundException, UserAlreadyExistsException {
+    public User partiallyUpdateUser(Long organizationId, Long userId, UserUpdateRequest request) throws UserNotFoundException, UserAlreadyExistsException {
         var user = getById(organizationId, userId);
 
         if (request.getEmail() != null) {
@@ -115,13 +101,12 @@ public class UserService {
         if (request.getPhone() != null) {
             request.getPhone().ifPresent(user::setPhone);
         }
-        user = userRepository.update(user);
-        return userMapper.toUserResponse(user);
+        return userRepository.update(user);
     }
 
 
     @Transactional
-    public UserResponse changeUserStatus(long organizationId, long adminUserId, long targetUserId, UserStatus status)
+    public User changeUserStatus(long organizationId, long adminUserId, long targetUserId, UserStatus status)
             throws UnableToDisableCurrentUserException, UserNotFoundException {
         if (adminUserId == targetUserId) {
             throw new UnableToDisableCurrentUserException(targetUserId);
@@ -129,9 +114,7 @@ public class UserService {
 
         var user = getById(organizationId, targetUserId);
         user.setStatus(status);
-        user = userRepository.update(user);
-
-        return userMapper.toUserResponse(user);
+        return userRepository.update(user);
     }
 
     @Transactional
@@ -152,20 +135,6 @@ public class UserService {
         userRepository.update(user);
     }
 
-    @Transactional
-    public UserResponse setPasswordAfterInvitationActivation(Long organizationId, Long userId, String password) throws UserNotFoundException,
-            UserAlreadyActivatedException {
-        var user = getById(organizationId, userId);
-        checkActivatingIsAllowed(userId, password);
-        user.setPassword(passwordEncoder.encode(password));
-        return userMapper.toUserResponse(userRepository.update(user));
-    }
-
-    public void checkActivatingIsAllowed(Long userId, String password) throws UserAlreadyActivatedException {
-        if (StringUtils.hasText(password)) {
-            throw new UserAlreadyActivatedException(userId);
-        }
-    }
 
     private User buildUser(String email, UserRole role, String firstName, String lastName, String phone,
                            Long organizationId) {
