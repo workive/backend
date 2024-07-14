@@ -1,12 +1,14 @@
 package app.workive.api.user.service;
 
 import app.workive.api.auth.domain.AuthUserDetails;
+import app.workive.api.base.domain.model.request.PaginationRequest;
 import app.workive.api.organization.domain.entity.Organization;
 import app.workive.api.user.domain.UserRole;
 import app.workive.api.user.domain.UserStatus;
 import app.workive.api.user.domain.entity.User;
 import app.workive.api.user.domain.request.AdminUserCreateRequest;
 import app.workive.api.user.domain.request.UserCreateRequest;
+import app.workive.api.user.domain.request.UserFilterRequest;
 import app.workive.api.user.domain.request.UserUpdateRequest;
 import app.workive.api.user.domain.response.UserResponse;
 import app.workive.api.user.exception.IncorrectPasswordException;
@@ -17,10 +19,16 @@ import app.workive.api.user.mapper.UserMapper;
 import app.workive.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
+import static app.workive.api.user.repository.UserSpecifications.*;
 
 @Slf4j
 @Service
@@ -57,7 +65,7 @@ public class UserService {
     public UserResponse createOrganizationAdmin(Long organizationId, AdminUserCreateRequest request) throws UserAlreadyExistsException {
         checkIfUserExists(request.getEmail());
         var user = buildUser(request.getEmail(),
-                UserRole.ORGANIZATION_ADMIN,
+                UserRole.ADMIN,
                 request.getFirstName(),
                 request.getLastName(),
                 request.getPhone(),
@@ -158,5 +166,22 @@ public class UserService {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new IncorrectPasswordException();
         }
+    }
+
+    public Page<User> getUsers(Long organizationId, UserFilterRequest request, PaginationRequest page) {
+        var sort = Sort.by("id").descending();
+        var pageRequest = PageRequest.of(page.getPageNumber(), page.getPageSize(), sort);
+
+        var specs = hasOrganizationId(organizationId);
+
+        specs = specs.and(hasNotDeleted());
+
+        if (request.teamId() != null) {
+            specs = specs.and(hasTeamId(request.teamId()));
+        }
+        if (request.searchTerm() != null) {
+            specs = specs.and(hasNameLike(request.searchTerm()));
+        }
+        return userRepository.findAll(specs, pageRequest);
     }
 }

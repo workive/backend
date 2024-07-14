@@ -4,6 +4,7 @@ import app.workive.api.base.domain.model.request.PaginationRequest;
 import app.workive.api.dayoff.domain.DayOffStatus;
 import app.workive.api.dayoff.domain.entity.DayOff;
 import app.workive.api.dayoff.domain.request.DayOffCreateRequest;
+import app.workive.api.dayoff.domain.request.DayOffFilterRequest;
 import app.workive.api.dayoff.domain.request.DayOffUpdateRequest;
 import app.workive.api.dayoff.exception.DayOffNotFoundException;
 import app.workive.api.dayoff.exception.DayOffUpdateStatusFailedException;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static app.workive.api.dayoff.repository.DayOffSpecifications.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,9 +38,24 @@ public class DayOffService {
         return dayOffRepository.persist(dayOff);
     }
 
-    public Page<DayOff> getDaysOff(Long organizationId, PaginationRequest pagination) {
-        var paging = PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), Sort.by("id").descending());
-        return dayOffRepository.findByOrganizationId(organizationId, paging);
+    public Page<DayOff> getDaysOff(Long organizationId, DayOffFilterRequest filters, PaginationRequest pagination) {
+        var sort = Sort.by("id").descending();
+        var pageRequest = PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort);
+
+        var specs = hasOrganizationId(organizationId);
+
+
+        if (filters.teamId() != null) {
+            specs = specs.and(hasTeamId(filters.teamId()));
+        }
+        if(filters.userId() != null) {
+            specs = specs.and(hasUserId(filters.userId()));
+        }
+        if(filters.status() != null) {
+            specs = specs.and(hasStatus(filters.status()));
+        }
+        return dayOffRepository.findAll(specs, pageRequest);
+
     }
 
     public Page<DayOff> getDaysOff(Long organizationId, Long userId, PaginationRequest pagination) {

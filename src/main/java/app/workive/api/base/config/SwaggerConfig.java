@@ -43,7 +43,6 @@ public class SwaggerConfig {
     private MessageSourceAccessor accessor;
 
 
-
     @PostConstruct
     public void init() {
         accessor = new MessageSourceAccessor(messageSource, Locale.ENGLISH);
@@ -64,7 +63,7 @@ public class SwaggerConfig {
             for (var eachException : exceptions) {
                 var exceptionMappingAnnotation = eachException.getDeclaredAnnotation(ResponseStatus.class);
                 if (exceptionMappingAnnotation != null) {
-                    var errorName = eachException.getSimpleName().replaceAll("Exception","Error");
+                    var errorName = eachException.getSimpleName().replaceAll("Exception", "Error");
                     var errors = additionalResponses.getOrDefault(key, new ArrayList<>());
                     //var errorCode = className.getSimpleName().replaceAll("Exception","Error");
                     errors.add(errorName);
@@ -213,13 +212,13 @@ public class SwaggerConfig {
         for (var bd : scanner.findCandidateComponents("com.routetitan.account.api")) {
             var className = Class.forName(bd.getBeanClassName());
             var annotation = className.getDeclaredAnnotation(ResponseStatus.class);
-            var errorCode = className.getSimpleName().replaceAll("Exception","Error");
+            var errorCode = className.getSimpleName().replaceAll("Exception", "Error");
             var statusCode = annotation.code();
             components.addSchemas(errorCode, buildErrorsSchema(errorCode, statusCode, bd));
         }
 
         components.addSecuritySchemes("apiKeyAuth", new SecurityScheme().type(SecurityScheme.Type.APIKEY).name("API-Key").in(SecurityScheme.In.HEADER));
-        components.addSecuritySchemes("authorizationKeyAuth", new SecurityScheme().type(SecurityScheme.Type.APIKEY).name("Authorization").in(SecurityScheme.In.HEADER));
+        components.addSecuritySchemes("authorizationKeyAuth", new SecurityScheme().type(SecurityScheme.Type.APIKEY).name("Authorization").bearerFormat("jwt").in(SecurityScheme.In.HEADER));
 
         return components;
     }
