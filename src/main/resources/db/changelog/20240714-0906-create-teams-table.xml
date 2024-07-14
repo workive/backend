@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="20240714-0906-create-teams-table" author="M.Karimi">
+        <createSequence sequenceName="team_id_seq" startValue="1" minValue="1" incrementBy="1" cycle="false"/>
+
+        <createTable tableName="teams">
+            <column name="id" type="BIGINT" defaultValue="nextval('team_id_seq')">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="team_key_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+
+            <column name="name" type="VARCHAR"/>
+
+            <column name="organization_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="metadata" type="JSONB" />
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="teams" baseColumnNames="organization_id"
+                                 constraintName="teams_organization_id_fkey"
+                                 referencedTableName="organizations" referencedColumnNames="id"/>
+
+    </changeSet>
+</databaseChangeLog>
