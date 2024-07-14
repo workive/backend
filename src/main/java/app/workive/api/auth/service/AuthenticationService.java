@@ -11,6 +11,7 @@ import app.workive.api.organization.service.OrganizationService;
 import app.workive.api.user.domain.request.AdminUserCreateRequest;
 import app.workive.api.user.exception.UserAlreadyExistsException;
 import app.workive.api.user.exception.UserNotFoundException;
+import app.workive.api.user.mapper.UserMapper;
 import app.workive.api.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +30,9 @@ import java.time.LocalDateTime;
 public class AuthenticationService implements UserDetailsService {
     private final OrganizationService organizationService;
     private final TokenService tokenService;
-
     private final UserService userService;
     private final ApplicationEventPublisher eventPublisher;
-
+    private final UserMapper userMapper;
 
 
 //    private final ApiKeyService apiKeyService;
@@ -43,7 +43,7 @@ public class AuthenticationService implements UserDetailsService {
 
         var registerRequest = new AdminUserCreateRequest(request.getEmail(), request.getPassword(),
                 request.getFirstName(), request.getLastName(), request.getPhone());
-        var user = userService.createOrganizationAdmin(organization.getId(),  registerRequest);
+        var user = userService.createOrganizationAdmin(organization.getId(), registerRequest);
         eventPublisher.publishEvent(new OrganizationCreatedEvent(organization, user));
 
         var accessToken = tokenService.generateAccessToken(
@@ -68,7 +68,7 @@ public class AuthenticationService implements UserDetailsService {
                     LocalDateTime.now().plusDays(1)
             );
             var refreshToken = tokenService.generateRefreshToken(user.getId().toString(), LocalDateTime.now().plusDays(7));
-            return new AuthenticationResponse(accessToken, refreshToken, user);
+            return new AuthenticationResponse(accessToken, refreshToken, userMapper.toUserResponse(user));
 
         } catch (UserNotFoundException ex) {
             throw new InvalidCredentialException(request.getEmail());
