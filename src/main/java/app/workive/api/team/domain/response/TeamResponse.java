@@ -1,4 +1,6 @@
 package app.workive.api.team.domain.response;
 
-public record TeamResponse(Long id, String name) {
+import java.util.Map;
+
+public record TeamResponse(Long id, String name, Map<String,Object> metadata) {
 }

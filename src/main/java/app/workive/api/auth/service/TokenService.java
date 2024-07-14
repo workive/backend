@@ -87,7 +87,7 @@ public class TokenService {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
-        return null;
+        return bearerToken;
     }
 
     public boolean validateToken(String token) {

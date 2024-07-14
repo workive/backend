@@ -5,6 +5,7 @@ import app.workive.api.base.domain.model.request.PaginationRequest;
 import app.workive.api.base.domain.model.response.PagedResponse;
 import app.workive.api.base.mapper.PagedResponseMapper;
 import app.workive.api.dayoff.domain.request.DayOffCreateRequest;
+import app.workive.api.dayoff.domain.request.DayOffFilterRequest;
 import app.workive.api.dayoff.domain.request.DayOffUpdateRequest;
 import app.workive.api.dayoff.domain.response.DayOffResponse;
 import app.workive.api.dayoff.exception.DayOffNotFoundException;
@@ -34,8 +35,9 @@ public class DayOffController {
     }
 
     @GetMapping
-    public PagedResponse<DayOffResponse> getDaysOff(@ParameterObject @Valid PaginationRequest pagination) {
-        var daysOff = dayOffService.getDaysOff(securityService.getUserOrganizationId(), pagination);
+    public PagedResponse<DayOffResponse> getDaysOff(@ParameterObject @Valid PaginationRequest pagination,
+                                                    @ParameterObject @Valid DayOffFilterRequest filters) {
+        var daysOff = dayOffService.getDaysOff(securityService.getUserOrganizationId(),filters, pagination);
         return pagedResponseMapper.toPagedResponse(
                 dayOffMapper.toDayOffResponseList(daysOff.getContent()),
                 daysOff.getNumber(),

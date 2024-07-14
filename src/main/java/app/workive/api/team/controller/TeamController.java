@@ -2,11 +2,13 @@ package app.workive.api.team.controller;
 
 import app.workive.api.auth.service.SecurityService;
 import app.workive.api.organization.exception.OrganizationNotFoundException;
+import app.workive.api.team.domain.exception.TeamNotFoundException;
 import app.workive.api.team.domain.request.TeamCreateRequest;
 import app.workive.api.team.domain.response.TeamResponse;
 import app.workive.api.team.mapper.TeamMapper;
 import app.workive.api.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +30,18 @@ public class TeamController {
     @PostMapping
     public TeamResponse createTeam(@RequestBody TeamCreateRequest request) throws OrganizationNotFoundException {
         return teamMapper.toTeamResponse(teamService.createTeam(securityService.getUserOrganizationId(), request));
+    }
+
+    @PutMapping("{id}")
+    public TeamResponse updateTeam(@PathVariable Long id, @RequestBody TeamCreateRequest request) throws TeamNotFoundException {
+        return teamMapper.toTeamResponse(teamService.updateTeam(securityService.getUserOrganizationId(), id, request));
+    }
+
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("{id}")
+    public void removeTeam(@PathVariable Long id) throws TeamNotFoundException {
+        teamService.removeTeam(securityService.getUserOrganizationId(), id);
     }
 
 }

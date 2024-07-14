@@ -19,15 +19,30 @@
             <column name="name" type="VARCHAR"/>
 
             <column name="organization_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
 
-            <column name="metadata" type="JSONB" />
+            <column name="metadata" type="JSONB"/>
         </createTable>
 
         <addForeignKeyConstraint baseTableName="teams" baseColumnNames="organization_id"
                                  constraintName="teams_organization_id_fkey"
                                  referencedTableName="organizations" referencedColumnNames="id"/>
 
+    </changeSet>
+    <changeSet id="20240714-0930-add-team-id-to-users-table" author="M.Karimi">
+        <addColumn tableName="users">
+            <column name="team_id" type="BIGINT">
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="users" baseColumnNames="team_id"
+                                 constraintName="user_team_id_fkey"
+                                 referencedTableName="teams" referencedColumnNames="id"/>
+    </changeSet>
+    <changeSet id="20240714-0930-add-status-to-teams-table" author="M.Karimi">
+        <addColumn tableName="teams">
+            <column name="status" type="VARCHAR">
+            </column>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>
