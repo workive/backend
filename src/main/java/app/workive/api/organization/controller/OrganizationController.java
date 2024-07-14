@@ -31,6 +31,6 @@ public class OrganizationController {
     @PreAuthorize("hasAnyRole('admin')")
     public OrganizationResponse updateOrganization(@Valid @RequestBody OrganizationUpdateRequest request)
             throws OrganizationNotFoundException {
-        return organizationMapper.toResponse(organizationService.updateOrganization(securityService.getUserOrganizationId(), request.getName()));
+        return organizationMapper.toResponse(organizationService.updateOrganization(securityService.getUserOrganizationId(), request));
     }
 }
