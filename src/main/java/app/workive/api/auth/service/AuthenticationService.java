@@ -6,8 +6,13 @@ import app.workive.api.auth.domain.request.RegistrationRequest;
 import app.workive.api.auth.domain.response.AuthenticationResponse;
 import app.workive.api.auth.exception.InvalidCredentialException;
 import app.workive.api.base.exception.BaseException;
+import app.workive.api.organization.domain.event.OrganizationCreateRequest;
 import app.workive.api.organization.domain.event.OrganizationCreatedEvent;
+import app.workive.api.organization.exception.OrganizationNotFoundException;
 import app.workive.api.organization.service.OrganizationService;
+import app.workive.api.team.domain.exception.TeamNotFoundException;
+import app.workive.api.team.domain.request.TeamCreateRequest;
+import app.workive.api.team.service.TeamService;
 import app.workive.api.user.domain.request.AdminUserCreateRequest;
 import app.workive.api.user.exception.UserAlreadyExistsException;
 import app.workive.api.user.exception.UserNotFoundException;
@@ -33,17 +38,16 @@ public class AuthenticationService implements UserDetailsService {
     private final UserService userService;
     private final ApplicationEventPublisher eventPublisher;
     private final UserMapper userMapper;
+    private final TeamService teamService;
 
-
-//    private final ApiKeyService apiKeyService;
 
     @Transactional(rollbackFor = BaseException.class)
-    public AuthenticationResponse register(RegistrationRequest request) throws UserAlreadyExistsException {
-        var organization = organizationService.registerOrganization(request.getOrganizationName());
-
+    public AuthenticationResponse register(RegistrationRequest request) throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException {
+        var organization = organizationService.registerOrganization(new OrganizationCreateRequest(request.getOrganizationName(),request.getCountryCode(), request.getTimezone()));
+        var team = teamService.createTeam(organization.getId(), new TeamCreateRequest("Default", null));
         var registerRequest = new AdminUserCreateRequest(request.getEmail(), request.getPassword(),
                 request.getFirstName(), request.getLastName(), request.getPhone());
-        var user = userService.createOrganizationAdmin(organization.getId(), registerRequest);
+        var user = userService.createOrganizationAdmin(organization.getId(), team.getId(),registerRequest);
         eventPublisher.publishEvent(new OrganizationCreatedEvent(organization, user));
 
         var accessToken = tokenService.generateAccessToken(

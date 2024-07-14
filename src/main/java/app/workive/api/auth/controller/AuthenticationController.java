@@ -7,6 +7,8 @@ import app.workive.api.auth.domain.request.RegistrationRequest;
 import app.workive.api.auth.domain.response.AuthenticationResponse;
 import app.workive.api.auth.exception.InvalidCredentialException;
 import app.workive.api.auth.service.AuthenticationService;
+import app.workive.api.organization.exception.OrganizationNotFoundException;
+import app.workive.api.team.domain.exception.TeamNotFoundException;
 import app.workive.api.user.exception.UserAlreadyExistsException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +28,7 @@ public class AuthenticationController {
 
     @PostMapping("register")
     @ResponseStatus(HttpStatus.CREATED)
-    public AuthenticationResponse register(@Valid @RequestBody RegistrationRequest request) throws UserAlreadyExistsException {
+    public AuthenticationResponse register(@Valid @RequestBody RegistrationRequest request) throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException {
         return authenticationService.register(request);
     }
 

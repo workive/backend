@@ -3,6 +3,8 @@ package app.workive.api.user.service;
 import app.workive.api.auth.domain.AuthUserDetails;
 import app.workive.api.base.domain.model.request.PaginationRequest;
 import app.workive.api.organization.domain.entity.Organization;
+import app.workive.api.team.domain.exception.TeamNotFoundException;
+import app.workive.api.team.service.TeamService;
 import app.workive.api.user.domain.UserRole;
 import app.workive.api.user.domain.UserStatus;
 import app.workive.api.user.domain.entity.User;
@@ -38,6 +40,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TeamService teamService;
 
     public void checkIfUserExists(String email) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(email)) {
@@ -62,8 +65,9 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse createOrganizationAdmin(Long organizationId, AdminUserCreateRequest request) throws UserAlreadyExistsException {
+    public UserResponse createOrganizationAdmin(Long organizationId,Long teamId, AdminUserCreateRequest request) throws UserAlreadyExistsException, TeamNotFoundException {
         checkIfUserExists(request.getEmail());
+        var team = teamService.getTeam(organizationId,teamId);
         var user = buildUser(request.getEmail(),
                 UserRole.ADMIN,
                 request.getFirstName(),
@@ -71,6 +75,7 @@ public class UserService {
                 request.getPhone(),
                 organizationId
         );
+        user.setTeam(team);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user = userRepository.merge(user);
         return userMapper.toUserResponse(user);
@@ -88,7 +93,8 @@ public class UserService {
                 request.getPhone(),
                 organizationId
         );
-        userRepository.update(user);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user = userRepository.merge(user);
         return userMapper.toUserResponse(user);
     }
 

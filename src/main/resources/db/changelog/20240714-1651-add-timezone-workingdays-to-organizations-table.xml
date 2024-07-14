@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="20240714-1651-add-timezone-workingdays-to-organizations-table" author="M.Karimi">
+        <addColumn tableName="organizations">
+            <column name="timezone" type="VARCHAR" />
+            <column name="working_days" type="VARCHAR[]" />
+            <column name="week_first_day" type="VARCHAR" />
+        </addColumn>
+    </changeSet>
+    <changeSet id="20240714-1651-add-workingdays-week-first-day-to-organizations-table" author="M.Karimi">
+        <sql>
+            CREATE TYPE weekday AS ENUM ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY');
+        </sql>
+        <modifyDataType tableName="organizations" columnName="working_days" newDataType="weekday[]" />
+        <modifyDataType tableName="organizations" columnName="week_first_day" newDataType="weekday" />
+    </changeSet>
+</databaseChangeLog>
