@@ -1,13 +1,16 @@
 package app.teamwize.api.team.controller;
 
 import app.teamwize.api.auth.service.SecurityService;
+import app.teamwize.api.base.domain.model.request.PaginationRequest;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
 import app.teamwize.api.team.domain.request.TeamCreateRequest;
 import app.teamwize.api.team.domain.response.TeamResponse;
 import app.teamwize.api.team.mapper.TeamMapper;
 import app.teamwize.api.team.service.TeamService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +26,8 @@ public class TeamController {
     private final SecurityService securityService;
 
     @GetMapping
-    public List<TeamResponse> getTeams() {
-        return teamMapper.toTeamResponseList(teamService.getTeams(securityService.getUserOrganizationId()));
+    public List<TeamResponse> getTeams(@ParameterObject @Valid PaginationRequest pagination) {
+        return teamMapper.toTeamResponseList(teamService.getTeams(securityService.getUserOrganizationId(),pagination));
     }
 
     @PostMapping

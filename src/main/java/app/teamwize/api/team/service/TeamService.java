@@ -1,5 +1,6 @@
 package app.teamwize.api.team.service;
 
+import app.teamwize.api.base.domain.model.request.PaginationRequest;
 import app.teamwize.api.organization.service.OrganizationService;
 import app.teamwize.api.team.repository.TeamRepository;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
@@ -8,6 +9,8 @@ import app.teamwize.api.team.domain.entity.Team;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
 import app.teamwize.api.team.domain.request.TeamCreateRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +23,10 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final OrganizationService organizationService;
 
-    public List<Team> getTeams(Long organizationId) {
-        return teamRepository.findByOrganizationIdAndStatusIsIn(organizationId,List.of(TeamStatus.DEFAULT));
+    public List<Team> getTeams(Long organizationId, PaginationRequest pagination) {
+        var sort = Sort.by("id").descending();
+        var pageRequest = PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort);
+        return teamRepository.findByOrganizationIdAndStatusIsIn(organizationId,List.of(TeamStatus.DEFAULT),pageRequest);
     }
 
     @Transactional
