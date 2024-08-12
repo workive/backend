@@ -1,7 +1,6 @@
 package app.workive.api.team.service;
 
 import app.workive.api.organization.exception.OrganizationNotFoundException;
-import app.workive.api.organization.repository.OrganizationRepository;
 import app.workive.api.organization.service.OrganizationService;
 import app.workive.api.team.domain.TeamStatus;
 import app.workive.api.team.domain.entity.Team;
@@ -31,6 +30,7 @@ public class TeamService {
         var team = new Team();
         team.setName(request.name())
                 .setMetadata(request.metadata())
+                .setStatus(TeamStatus.DEFAULT)
                 .setOrganization(organization);
         return teamRepository.persist(team);
     }
