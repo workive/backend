@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="20240815-1430-create-holidays-table" author="M.Karimi">
+        <createSequence sequenceName="holiday_id_seq" startValue="1" minValue="1" incrementBy="10" cycle="false"/>
+
+        <createTable tableName="holidays">
+            <column name="id" type="BIGINT" defaultValue="nextval('holiday_id_seq')">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="holiday_key_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+
+
+            <column name="description" type="VARCHAR"/>
+
+            <column name="status" type="VARCHAR"/>
+
+            <column name="country_code" type="VARCHAR"/>
+
+            <column name="date" type="DATE"/>
+
+            <column name="organization_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="metadata" type="JSONB"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="holidays" baseColumnNames="organization_id"
+                                 constraintName="holidays_organization_id_fkey"
+                                 referencedTableName="organizations" referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
