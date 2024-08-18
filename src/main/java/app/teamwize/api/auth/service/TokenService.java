@@ -70,7 +70,7 @@ public class TokenService {
                 .withPayload(claims)
                 .withSubject(subject)
                 .withIssuedAt(now)
-                .withIssuer("Routetitan-Auth")
+                .withIssuer("Teamwize-Auth")
                 .withExpiresAt(expiresAtInstant)
                 .sign(key);
     }

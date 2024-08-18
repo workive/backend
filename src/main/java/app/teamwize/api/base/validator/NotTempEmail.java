@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = NotTempEmailValidator.class)
 public @interface NotTempEmail {
 
-    String message() default "com.routetitan.account.nottempmail";
+    String message();
 
     Class<?>[] groups() default {};
 

@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Component
-public class RoutetitanOpenApiModelConverter implements ModelConverter {
+public class TeamwizeOpenApiModelConverter implements ModelConverter {
 
     @Override
     public Schema resolve(AnnotatedType type, ModelConverterContext context, Iterator<ModelConverter> chain) {

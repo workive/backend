@@ -207,7 +207,7 @@ public class SwaggerConfig {
 
         scanner.addIncludeFilter(new AnnotationTypeFilter(ResponseStatus.class));
 
-        for (var bd : scanner.findCandidateComponents("com.routetitan.account.api")) {
+        for (var bd : scanner.findCandidateComponents("app.teamwize.api")) {
             var className = Class.forName(bd.getBeanClassName());
             var annotation = className.getDeclaredAnnotation(ResponseStatus.class);
             var errorCode = className.getSimpleName().replaceAll("Exception", "Error");
