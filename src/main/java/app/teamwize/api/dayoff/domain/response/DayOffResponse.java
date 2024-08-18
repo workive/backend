@@ -14,5 +14,6 @@ public record DayOffResponse(
         LocalDateTime endAt,
         DayOffStatus status,
         DayOffType type,
+        String reason,
         UserCompactResponse user) {
 }

@@ -12,6 +12,7 @@ import app.teamwize.api.dayoff.domain.response.DayOffResponse;
 import app.teamwize.api.dayoff.exception.DayOffNotFoundException;
 import app.teamwize.api.dayoff.exception.DayOffUpdateStatusFailedException;
 import app.teamwize.api.dayoff.service.DayOffService;
+import app.teamwize.api.user.exception.UserNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -29,7 +30,7 @@ public class DayOffController {
 
 
     @PostMapping
-    public DayOffResponse create(@RequestBody DayOffCreateRequest request) {
+    public DayOffResponse create(@RequestBody DayOffCreateRequest request) throws UserNotFoundException {
         var dayOff = dayOffService.createDayOff(securityService.getUserOrganizationId(), securityService.getUserId(), request);
         return dayOffMapper.toDayOffResponse(dayOff);
     }

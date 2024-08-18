@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 public record DayOffCreateRequest(
         DayOffType type,
+        String reason,
         LocalDateTime start,
         LocalDateTime end
 ) {

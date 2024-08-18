@@ -21,6 +21,10 @@ public record UserCompactResponse(
         String lastName,
         @Nullable
         String phone,
+        @Nullable
+        String countryCode,
+        @Nullable
+        String timezone,
         @Nonnull
         TeamCompactResponse team) {
 }

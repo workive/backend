@@ -23,3 +23,6 @@ databaseChangeLog:
   - include:
       file: 20240815-2230-add-timezone-country-code-to-user-table.xml
       relativeToChangelogFile: true
+  - include:
+      file: 20240818-0933-add-reason-to-days-off-table.xml
+      relativeToChangelogFile: true
