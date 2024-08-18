@@ -43,12 +43,18 @@ public class AuthenticationService implements UserDetailsService {
 
     @Transactional(rollbackFor = BaseException.class)
     public AuthenticationResponse register(RegistrationRequest request) throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException {
-        var organization = organizationService.registerOrganization(new OrganizationCreateRequest(request.getOrganizationName(),request.getCountryCode(), request.getTimezone()));
+        var organization = organizationService.registerOrganization(new OrganizationCreateRequest(request.organizationName(),request.countryCode(), request.timezone()));
         var team = teamService.createTeam(organization.getId(), new TeamCreateRequest("Default", null));
-        var registerRequest = new AdminUserCreateRequest(request.getEmail(), request.getPassword(),
-                request.getFirstName(), request.getLastName(), request.getPhone());
+        var registerRequest = new AdminUserCreateRequest(
+                request.email(),
+                request.password(),
+                request.firstName(),
+                request.lastName(),
+                request.phone(),
+                request.timezone()
+        );
         var user = userService.createOrganizationAdmin(organization.getId(), team.getId(),registerRequest);
-        eventPublisher.publishEvent(new OrganizationCreatedEvent(organization, user));
+        eventPublisher.publishEvent(new OrganizationCreatedEvent(organization, userMapper.toUserResponse(user)));
 
         var accessToken = tokenService.generateAccessToken(
                 user.getId().toString(),
@@ -58,7 +64,7 @@ public class AuthenticationService implements UserDetailsService {
                 LocalDateTime.now().plusDays(1)
         );
         var refreshToken = tokenService.generateRefreshToken(user.getId().toString(), LocalDateTime.now().plusDays(7));
-        return new AuthenticationResponse(accessToken, refreshToken, user);
+        return new AuthenticationResponse(accessToken, refreshToken, userMapper.toUserResponse(user));
     }
 
     public AuthenticationResponse login(LoginRequest request) throws InvalidCredentialException {

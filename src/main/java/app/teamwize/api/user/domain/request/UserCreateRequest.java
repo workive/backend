@@ -5,14 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class UserCreateRequest {
-    private String email;
-    private String firstName;
-    private String lastName;
-    private String password;
-    private String phone;
-    private UserRole role;
+public record UserCreateRequest(
+        String email,
+        String firstName,
+        String lastName,
+        String password,
+        String phone,
+        UserRole role,
+        String timezone,
+        String countryCode,
+        Long teamId
+) {
 }

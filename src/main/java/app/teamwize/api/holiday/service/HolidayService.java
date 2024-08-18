@@ -42,7 +42,7 @@ public class HolidayService {
         }
         var organization = organizationService.getOrganization(organizationId);
         try {
-            return publicHolidayProvider.getPublicHolidays(organization.getCountry(), year);
+            return publicHolidayProvider.getPublicHolidays(organization.getCountryCode(), year);
         } catch (Exception ex) {
             throw new PublicHolidayProviderConnectionBrokenException();
         }
