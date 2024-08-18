@@ -1,8 +1,10 @@
 package app.teamwize.api.user.service;
 
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
-import app.teamwize.api.user.exception.IncorrectPasswordException;
-import app.teamwize.api.user.exception.UnableToDisableCurrentUserException;
+import app.teamwize.api.organization.exception.OrganizationNotFoundException;
+import app.teamwize.api.organization.service.OrganizationService;
+import app.teamwize.api.team.domain.entity.Team;
+import app.teamwize.api.user.exception.*;
 import app.teamwize.api.auth.domain.AuthUserDetails;
 import app.teamwize.api.organization.domain.entity.Organization;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
@@ -14,10 +16,6 @@ import app.teamwize.api.user.domain.request.AdminUserCreateRequest;
 import app.teamwize.api.user.domain.request.UserCreateRequest;
 import app.teamwize.api.user.domain.request.UserFilterRequest;
 import app.teamwize.api.user.domain.request.UserUpdateRequest;
-import app.teamwize.api.user.domain.response.UserResponse;
-import app.teamwize.api.user.exception.UserAlreadyExistsException;
-import app.teamwize.api.user.exception.UserNotFoundException;
-import app.teamwize.api.user.mapper.UserMapper;
 import app.teamwize.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +35,7 @@ import static app.teamwize.api.user.repository.UserSpecifications.*;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserMapper userMapper;
+    private final OrganizationService organizationService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TeamService teamService;
@@ -65,37 +63,52 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse createOrganizationAdmin(Long organizationId,Long teamId, AdminUserCreateRequest request) throws UserAlreadyExistsException, TeamNotFoundException {
-        checkIfUserExists(request.getEmail());
-        var team = teamService.getTeam(organizationId,teamId);
-        var user = buildUser(request.getEmail(),
-                UserRole.ADMIN,
-                request.getFirstName(),
-                request.getLastName(),
-                request.getPhone(),
-                organizationId
-        );
+    public User createOrganizationAdmin(Long organizationId, Long teamId, AdminUserCreateRequest request) throws UserAlreadyExistsException, TeamNotFoundException, OrganizationNotFoundException {
+        var organization = organizationService.getOrganization(organizationId);
+        checkIfUserExists(request.email());
+        var team = teamService.getTeam(organizationId, teamId);
+        var user = new User()
+                .setStatus(UserStatus.ENABLED)
+                .setEmail(request.email())
+                .setRole(UserRole.ORGANIZATION_ADMIN)
+                .setFirstName(request.firstName())
+                .setLastName(request.lastName())
+                .setPhone(request.phone())
+                .setTimezone(request.timezone())
+                .setCountryCode(null)
+                .setTeam(team)
+                .setOrganization(organization);
         user.setTeam(team);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user = userRepository.merge(user);
-        return userMapper.toUserResponse(user);
+        user.setPassword(passwordEncoder.encode(request.password()));
+        return userRepository.merge(user);
     }
 
     @Transactional
-    public UserResponse createUser(Long organizationId, UserCreateRequest request)
-            throws UserAlreadyExistsException {
-        checkIfUserExists(request.getEmail());
-        var user = buildUser(
-                request.getEmail(),
-                request.getRole(),
-                request.getFirstName(),
-                request.getLastName(),
-                request.getPhone(),
-                organizationId
-        );
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user = userRepository.merge(user);
-        return userMapper.toUserResponse(user);
+    public User createUser(Long organizationId, Long inviterUserId, UserCreateRequest request)
+            throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException, UserNotFoundException, PermissionDeniedException {
+        var organization = organizationService.getOrganization(organizationId);
+        var team = teamService.getTeam(organizationId, request.teamId());
+        checkIfUserExists(request.email());
+        var inviterUser = userRepository.findById(inviterUserId).orElseThrow(() -> new UserNotFoundException(organizationId, inviterUserId));
+        if (inviterUser.getRole() != UserRole.ORGANIZATION_ADMIN) {
+            throw new PermissionDeniedException(organizationId);
+        }
+        var user = new User()
+                .setStatus(UserStatus.ENABLED)
+                .setEmail(request.email())
+                .setRole(request.role())
+                .setFirstName(request.firstName())
+                .setLastName(request.lastName())
+                .setPhone(request.phone())
+                .setTimezone(request.timezone())
+                .setCountryCode(request.countryCode())
+                .setTeam(team)
+                .setOrganization(organization);
+
+        if (request.password() != null && !request.password().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.password()));
+        }
+        return userRepository.persist(user);
     }
 
     @Transactional
@@ -148,20 +161,6 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(password));
         userRepository.update(user);
     }
-
-
-    private User buildUser(String email, UserRole role, String firstName, String lastName, String phone,
-                           Long organizationId) {
-        return new User()
-                .setStatus(UserStatus.ENABLED)
-                .setEmail(email)
-                .setRole(role)
-                .setFirstName(firstName)
-                .setLastName(lastName)
-                .setPhone(phone)
-                .setOrganization(new Organization(organizationId));
-    }
-
 
     private User getById(Long organizationId, Long userId) throws UserNotFoundException {
         return userRepository.findByOrganizationIdAndId(organizationId, userId)

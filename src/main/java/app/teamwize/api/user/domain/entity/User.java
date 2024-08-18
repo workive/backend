@@ -22,7 +22,6 @@ public class User extends BaseAuditEntity {
     @GeneratedValue(generator = "user_id_seq_generator")
     @SequenceGenerator(name = "user_id_seq_generator", sequenceName = "user_id_seq", allocationSize = 1)
     private Long id;
-
     @Enumerated(EnumType.STRING)
     private UserRole role;
     private String email;
@@ -30,14 +29,12 @@ public class User extends BaseAuditEntity {
     private String phone;
     private String firstName;
     private String lastName;
-
+    private String countryCode;
+    private String timezone;
     @ManyToOne(fetch = FetchType.LAZY)
     private Organization organization;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Team team;
-
-
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 

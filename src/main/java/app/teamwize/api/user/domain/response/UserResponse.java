@@ -11,25 +11,18 @@ import lombok.NoArgsConstructor;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
-@Data
-@NoArgsConstructor
-public  class UserResponse {
-    @Nonnull
-    private Long id;
-    @Nonnull
-    private UserStatus status;
-    @Nonnull
-    private UserRole role;
-    @Nonnull
-    private String email;
-    @Nonnull
-    private String firstName;
-    @Nullable
-    private String lastName;
-    @Nullable
-    private String phone;
-    @Nonnull
-    private OrganizationCompactResponse organization;
-    @Nonnull
-    private TeamCompactResponse team;
+
+public record UserResponse(
+        @Nonnull Long id,
+        @Nonnull UserStatus status,
+        @Nonnull UserRole role,
+        @Nonnull String email,
+        @Nonnull String firstName,
+        @Nullable String lastName,
+        @Nullable String phone,
+        @Nullable String timezone,
+        @Nullable String countryCode,
+        @Nonnull OrganizationCompactResponse organization,
+        @Nonnull TeamCompactResponse team
+) {
 }

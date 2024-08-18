@@ -4,13 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class AdminUserCreateRequest {
-    private String email;
-    private String password;
-    private String firstName;
-    private String lastName;
-    private String phone;
-}
+public record AdminUserCreateRequest(
+        String email,
+        String password,
+        String firstName,
+        String lastName,
+        String phone,
+        String timezone
+) {}

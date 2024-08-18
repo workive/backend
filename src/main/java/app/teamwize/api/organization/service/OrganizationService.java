@@ -38,7 +38,7 @@ public class OrganizationService {
                 .setWeekFirstDay(request.weekFirstDay())
                 .setWorkingDays(request.workingDays().toArray(DayOfWeek[]::new))
                 .setMetadata(request.metadata())
-                .setCountry(request.country());
+                .setCountryCode(request.country());
         return organizationRepository.update(organization);
     }
 
@@ -50,7 +50,7 @@ public class OrganizationService {
     private Organization buildOrganization(OrganizationCreateRequest request) {
         return new Organization()
                 .setName(request.name())
-                .setCountry(request.country())
+                .setCountryCode(request.country())
                 .setTimezone(request.timezone())
                 .setWeekFirstDay(DayOfWeek.MONDAY)
                 .setWorkingDays(new DayOfWeek[]{DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY});
