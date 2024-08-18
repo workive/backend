@@ -35,6 +35,8 @@ public class DayOff extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
+    private String reason;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Organization organization;
 

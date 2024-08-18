@@ -10,7 +10,8 @@ import app.teamwize.api.dayoff.exception.DayOffNotFoundException;
 import app.teamwize.api.dayoff.exception.DayOffUpdateStatusFailedException;
 import app.teamwize.api.dayoff.repository.DayOffRepository;
 import app.teamwize.api.organization.domain.entity.Organization;
-import app.teamwize.api.user.domain.entity.User;
+import app.teamwize.api.user.exception.UserNotFoundException;
+import app.teamwize.api.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,13 +26,16 @@ import static app.teamwize.api.dayoff.repository.DayOffSpecifications.*;
 public class DayOffService {
 
     private final DayOffRepository dayOffRepository;
+    private final UserService userService;
 
     @Transactional
-    public DayOff createDayOff(Long organizationId, Long userId, DayOffCreateRequest request) {
+    public DayOff createDayOff(Long organizationId, Long userId, DayOffCreateRequest request) throws UserNotFoundException {
+        var user = userService.getUser(organizationId,userId);
         var dayOff = new DayOff()
+                .setReason(request.reason())
                 .setStartAt(request.start())
                 .setEndAt(request.end())
-                .setUser(new User(userId))
+                .setUser(user)
                 .setOrganization(new Organization(organizationId))
                 .setStatus(DayOffStatus.PENDING)
                 .setType(request.type());
