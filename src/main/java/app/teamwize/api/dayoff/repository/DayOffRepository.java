@@ -14,14 +14,14 @@ import java.util.Optional;
 @Repository
 public interface DayOffRepository extends BaseJpaRepository<DayOff, Long>, JpaSpecificationExecutor<DayOff> {
 
-    @EntityGraph(attributePaths = {"user", "user.team"}, type = EntityGraph.EntityGraphType.FETCH)
+    @EntityGraph(attributePaths = {"user", "user.team", "user.avatar"}, type = EntityGraph.EntityGraphType.FETCH)
     Optional<DayOff> findByUserIdAndId(Long userId, Long id);
 
 
-    @EntityGraph(attributePaths = {"user", "user.team"}, type = EntityGraph.EntityGraphType.FETCH)
+    @EntityGraph(attributePaths = {"user", "user.team", "user.avatar"}, type = EntityGraph.EntityGraphType.FETCH)
     Page<DayOff> findByOrganizationIdAndUserId(Long organizationId, Long userId, Pageable page);
 
 
-    @EntityGraph(attributePaths = {"user", "user.team"}, type = EntityGraph.EntityGraphType.FETCH)
+    @EntityGraph(attributePaths = {"user", "user.team", "user.avatar"}, type = EntityGraph.EntityGraphType.FETCH)
     Page<DayOff> findAll(Specification<DayOff> spec, Pageable pageable);
 }
