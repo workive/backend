@@ -26,9 +26,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final AuthenticationService detailsService;
     private final TokenService tokenService;
 
-    private String jwtHeaderName = "Authorization";
+    private final String jwtHeaderName = "Authorization";
 
-    private String apiKeyHeaderName = "API-Key";
+    private final String apiKeyHeaderName = "API-Key";
+
+    private final String tokenQueryStringName = "token";
 
 
     @Override
@@ -60,7 +62,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         return StringUtils.hasText(request.getHeader(apiKeyHeaderName));
     }
 
+    private boolean tokenQueryParamExist(HttpServletRequest request) {
+        return StringUtils.hasText(request.getParameter(tokenQueryStringName));
+    }
+
     private String getJwtToken(HttpServletRequest request) {
+        if (tokenQueryParamExist(request)) {
+            return request.getParameter(tokenQueryStringName);
+        }
         return tokenService.getJwtFromRequest(request.getHeader(jwtHeaderName));
     }
 
