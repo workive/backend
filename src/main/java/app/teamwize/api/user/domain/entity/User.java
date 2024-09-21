@@ -30,7 +30,7 @@ public class User extends BaseAuditEntity {
     private String phone;
     private String firstName;
     private String lastName;
-    private String countryCode;
+    private String country;
     private String timezone;
     @ManyToOne(fetch = FetchType.LAZY)
     private Organization organization;

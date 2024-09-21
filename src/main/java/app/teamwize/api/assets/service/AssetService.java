@@ -38,7 +38,7 @@ public class AssetService {
     @Value("${app.storage.base-preview-url}")
     private String storageBasePreviewUrl;
 
-    @Value("${app.storage.bucket}")
+    @Value("${app.storage.s3.bucket-name}")
     private String bucketName;
 
     public Asset getAsset(Long organizationId, Long fileAssetId) throws AssetNotFoundException {

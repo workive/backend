@@ -30,7 +30,7 @@ public class AssetController {
     private final SecurityService securityService;
 
     @PostMapping(consumes = {"multipart/form-data"})
-    public List<AssetResponse> createAsset(@RequestParam AssetCategory bucket, @RequestParam("files") List<MultipartFile> files)
+    public List<AssetResponse> createAssets(@RequestParam AssetCategory bucket, @RequestParam("files") List<MultipartFile> files)
             throws AssetUploadFailedException, OrganizationNotFoundException {
         var organizationId = securityService.getUserOrganizationId();
         return buildResponses(assetService.createAssets(organizationId, bucket, files));

@@ -4,7 +4,11 @@ app:
   storage:
     temp-directory: ${java.io.tmpdir}
     base-preview-url: https://teamwize.app/assets/preview
-    bucket: "teamwize-bucket"
+    s3:
+      bucket-name: "main"
+      endpoint-url: "empty"
+      access-key: "empty"
+      secret-key: "empty"
   auth:
     api-key:
       characters-length: '64'

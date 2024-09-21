@@ -29,7 +29,7 @@ public class HolidayService {
         var holidays = requests.stream().map(holidayCreateRequest -> new Holiday()
                 .setDescription(holidayCreateRequest.description())
                 .setDate(holidayCreateRequest.date())
-                .setCountryCode(holidayCreateRequest.countryCode())
+                .setCountry(holidayCreateRequest.country())
                 .setOrganization(organization)
         ).toList();
         return holidayRepository.persistAll(holidays);
@@ -42,15 +42,15 @@ public class HolidayService {
         }
         var organization = organizationService.getOrganization(organizationId);
         try {
-            return publicHolidayProvider.getPublicHolidays(organization.getCountryCode(), year);
+            return publicHolidayProvider.getPublicHolidays(organization.getCountry(), year);
         } catch (Exception ex) {
             throw new PublicHolidayProviderConnectionBrokenException();
         }
     }
 
-    public List<Holiday> getHolidays(Long organizationId, Integer year, String countryCode) {
+    public List<Holiday> getHolidays(Long organizationId, Integer year, String country) {
         var startDate = LocalDate.of(year, 1, 1);
         var endDate = startDate.plusYears(1);
-        return holidayRepository.findByOrganizationIdAndCountryCodeAndDateIsBetween(organizationId, countryCode, startDate, endDate);
+        return holidayRepository.findByOrganizationIdAndCountryAndDateIsBetween(organizationId, country, startDate, endDate);
     }
 }

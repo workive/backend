@@ -7,13 +7,10 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +19,6 @@ public class StorageService {
     private static final Logger logger = LoggerFactory.getLogger(StorageService.class);
 
     private final S3Client amazonS3Client;
-    private final S3Presigner s3Presigner;
 
     public PutObjectResponse putObject(String bucket, String fileName, String fileContent, ObjectCannedACL access) {
         PutObjectRequest objectRequest = PutObjectRequest.builder()

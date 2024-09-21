@@ -34,8 +34,8 @@ public class HolidayController {
     }
 
     @GetMapping
-    public List<HolidayResponse> getHolidays(Integer year, String countryCode) {
-        var holidays = holidayService.getHolidays(securityService.getUserOrganizationId(), year, countryCode);
+    public List<HolidayResponse> getHolidays(Integer year, String country) {
+        var holidays = holidayService.getHolidays(securityService.getUserOrganizationId(), year, country);
         return holidayMapper.toHolidayResponses(holidays);
     }
 

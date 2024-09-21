@@ -22,7 +22,7 @@ public record UserCompactResponse(
         @Nullable
         String phone,
         @Nullable
-        String countryCode,
+        String country,
         @Nullable
         String timezone,
         @Nonnull

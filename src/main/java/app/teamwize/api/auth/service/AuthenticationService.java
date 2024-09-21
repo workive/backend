@@ -43,7 +43,7 @@ public class AuthenticationService implements UserDetailsService {
 
     @Transactional(rollbackFor = BaseException.class)
     public AuthenticationResponse register(RegistrationRequest request) throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException {
-        var organization = organizationService.registerOrganization(new OrganizationCreateRequest(request.organizationName(),request.countryCode(), request.timezone()));
+        var organization = organizationService.registerOrganization(new OrganizationCreateRequest(request.organizationName(),request.country(), request.timezone()));
         var team = teamService.createTeam(organization.getId(), new TeamCreateRequest("Default", null));
         var registerRequest = new AdminUserCreateRequest(
                 request.email(),

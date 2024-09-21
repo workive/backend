@@ -10,5 +10,5 @@ import java.util.List;
 
 @RequestMapping
 public interface HolidayRepository extends BaseJpaRepository<Holiday, Long>, JpaSpecificationExecutor<Holiday> {
-    List<Holiday> findByOrganizationIdAndCountryCodeAndDateIsBetween(Long organizationId, String countryCode, LocalDate startDate,LocalDate endDate);
+    List<Holiday> findByOrganizationIdAndCountryAndDateIsBetween(Long organizationId, String country, LocalDate startDate, LocalDate endDate);
 }
