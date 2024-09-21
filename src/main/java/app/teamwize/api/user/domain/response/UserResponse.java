@@ -1,12 +1,11 @@
 package app.teamwize.api.user.domain.response;
 
 
+import app.teamwize.api.assets.domain.model.response.AssetCompactResponse;
 import app.teamwize.api.team.domain.response.TeamCompactResponse;
 import app.teamwize.api.user.domain.UserRole;
 import app.teamwize.api.user.domain.UserStatus;
 import app.teamwize.api.organization.domain.response.OrganizationCompactResponse;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -21,8 +20,9 @@ public record UserResponse(
         @Nullable String lastName,
         @Nullable String phone,
         @Nullable String timezone,
-        @Nullable String countryCode,
+        @Nullable String country,
         @Nonnull OrganizationCompactResponse organization,
-        @Nonnull TeamCompactResponse team
+        @Nonnull TeamCompactResponse team,
+        @Nonnull AssetCompactResponse avatar
 ) {
 }

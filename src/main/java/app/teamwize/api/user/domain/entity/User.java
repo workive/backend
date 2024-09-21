@@ -1,6 +1,7 @@
 package app.teamwize.api.user.domain.entity;
 
 
+import app.teamwize.api.assets.domain.entity.Asset;
 import app.teamwize.api.user.domain.UserRole;
 import app.teamwize.api.user.domain.UserStatus;
 import app.teamwize.api.base.domain.entity.BaseAuditEntity;
@@ -29,7 +30,7 @@ public class User extends BaseAuditEntity {
     private String phone;
     private String firstName;
     private String lastName;
-    private String countryCode;
+    private String country;
     private String timezone;
     @ManyToOne(fetch = FetchType.LAZY)
     private Organization organization;
@@ -37,6 +38,8 @@ public class User extends BaseAuditEntity {
     private Team team;
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Asset avatar;
 
     public User(Long userId) {
         this.id = userId;

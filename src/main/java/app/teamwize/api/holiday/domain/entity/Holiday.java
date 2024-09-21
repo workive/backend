@@ -21,7 +21,7 @@ public class Holiday extends BaseAuditEntity {
 
     private LocalDate date;
 
-    private String countryCode;
+    private String country;
 
     private String description;
 

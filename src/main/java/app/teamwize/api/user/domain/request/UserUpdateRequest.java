@@ -11,15 +11,16 @@ import jakarta.validation.constraints.Size;
 @Data
 public class UserUpdateRequest {
 
-    @Email(message = "user.email.email_format")
-    @Size(min = 5, max = 255, message = "user.email.size")
+    @Email()
     private JsonNullable<String> email;
 
-    @Size(min = 1, max = 100, message = "user.full_name.size")
+    @Size(min = 1, max = 100)
     private JsonNullable<String> firstName;
 
-    @Size(min = 1, max = 100, message = "user.full_name.size")
+    @Size(min = 1, max = 100)
     private JsonNullable<String> lastName;
+
+    private JsonNullable<Long> avatarAssetId;
 
     @PhoneNumber
     private JsonNullable<String> phone;

@@ -31,6 +31,7 @@ public class OrganizationService {
         return organizationRepository.persist(organization);
     }
 
+    @Transactional
     public Organization updateOrganization(long organizationId, OrganizationUpdateRequest request) throws OrganizationNotFoundException {
         var organization = getById(organizationId)
                 .setName(request.name())
@@ -38,7 +39,7 @@ public class OrganizationService {
                 .setWeekFirstDay(request.weekFirstDay())
                 .setWorkingDays(request.workingDays().toArray(DayOfWeek[]::new))
                 .setMetadata(request.metadata())
-                .setCountryCode(request.country());
+                .setCountry(request.country());
         return organizationRepository.update(organization);
     }
 
@@ -50,7 +51,7 @@ public class OrganizationService {
     private Organization buildOrganization(OrganizationCreateRequest request) {
         return new Organization()
                 .setName(request.name())
-                .setCountryCode(request.country())
+                .setCountry(request.country())
                 .setTimezone(request.timezone())
                 .setWeekFirstDay(DayOfWeek.MONDAY)
                 .setWorkingDays(new DayOfWeek[]{DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY});

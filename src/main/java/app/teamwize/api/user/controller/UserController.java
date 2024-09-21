@@ -1,22 +1,22 @@
 package app.teamwize.api.user.controller;
 
 
+import app.teamwize.api.assets.domain.exception.AssetNotFoundException;
 import app.teamwize.api.auth.service.SecurityService;
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
 import app.teamwize.api.base.domain.model.response.PagedResponse;
+import app.teamwize.api.base.mapper.PagedResponseMapper;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
 import app.teamwize.api.user.domain.request.*;
+import app.teamwize.api.user.domain.response.UserResponse;
 import app.teamwize.api.user.exception.*;
 import app.teamwize.api.user.mapper.UserMapper;
 import app.teamwize.api.user.service.UserService;
-import app.teamwize.api.base.mapper.PagedResponseMapper;
-import app.teamwize.api.user.domain.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -54,6 +54,12 @@ public class UserController {
         return userMapper.toUserResponse(userService.getUser(securityService.getUserOrganizationId(), securityService.getUserId()));
     }
 
+    @PatchMapping("mine")
+    public UserResponse updateMyProfile(@RequestBody @Valid UserUpdateRequest request)
+            throws UserNotFoundException, UserAlreadyExistsException, AssetNotFoundException {
+        var organizationId = securityService.getUserOrganizationId();
+        return userMapper.toUserResponse(userService.partiallyUpdateUser(organizationId, securityService.getUserId(), request));
+    }
 
     @GetMapping("{userId}")
     public UserResponse getUser(@PathVariable Long userId) throws UserNotFoundException {
@@ -61,11 +67,13 @@ public class UserController {
     }
 
     @PatchMapping("{userId}")
-    public UserResponse updateMyProfile(@PathVariable Long userId, @RequestBody @Valid UserUpdateRequest request)
-            throws UserNotFoundException, UserAlreadyExistsException {
+    public UserResponse updateProfile(@PathVariable Long userId, @RequestBody @Valid UserUpdateRequest request)
+            throws UserNotFoundException, UserAlreadyExistsException, AssetNotFoundException {
         var organizationId = securityService.getUserOrganizationId();
         return userMapper.toUserResponse(userService.partiallyUpdateUser(organizationId, userId, request));
     }
+
+
 
     @PatchMapping("{userId}/status")
     @ResponseStatus(HttpStatus.NO_CONTENT)

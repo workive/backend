@@ -1,6 +1,14 @@
 server:
   port: 8001
 app:
+  storage:
+    temp-directory: ${java.io.tmpdir}
+    base-preview-url: https://teamwize.app/assets/preview
+    s3:
+      bucket-name: "main"
+      endpoint-url: "empty"
+      access-key: "empty"
+      secret-key: "empty"
   auth:
     api-key:
       characters-length: '64'
@@ -47,6 +55,9 @@ spring:
     compose:
       lifecycle-management: start_only
       enabled: true
+  servlet:
+    multipart:
+      max-file-size: "100MB"
 management:
   endpoints:
     web:
@@ -76,3 +87,4 @@ springdoc:
   api-docs:
     enabled: true
     path: /swagger-ui/openapi.json
+

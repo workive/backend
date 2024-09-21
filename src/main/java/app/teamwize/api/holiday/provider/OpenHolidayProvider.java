@@ -31,10 +31,10 @@ public class OpenHolidayProvider implements PublicHolidayProvider {
 
 
     @Override
-    public List<FetchedPublicHoliday> getPublicHolidays(String countryCode, Integer year) {
+    public List<FetchedPublicHoliday> getPublicHolidays(String country, Integer year) {
         List<OpenHolidayResponse> publicHolidays = this.restClient.get().uri(uriBuilder -> uriBuilder
                         .path("/PublicHolidays")
-                        .queryParam("countryIsoCode", countryCode)
+                        .queryParam("countryIsoCode", country)
                         .queryParam("languageIsoCode", "EN")
                         .queryParam("validFrom", LocalDate.of(year, 1, 1).toString())
                         .queryParam("validTo", LocalDate.of(year + 1, 1, 1).toString())

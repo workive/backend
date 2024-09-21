@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="20240831-1733-create-asset-table" author="M.Karimi">
+        <createSequence sequenceName="asset_id_seq" startValue="1" minValue="1" incrementBy="1" cycle="false"/>
+        <createTable tableName="assets">
+            <column name="id" type="BIGINT" defaultValue="nextval('asset_id_seq')">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="asset_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="name" type="VARCHAR(50)"/>
+            <column name="original_name" type="VARCHAR(100)"/>
+            <column name="content_type" type="VARCHAR(30)"/>
+            <column name="size" type="BIGINT"/>
+            <column name="category" type="VARCHAR(50)"/>
+            <column name="url" type="VARCHAR(200)"/>
+            <column name="organization_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="assets" baseColumnNames="organization_id"
+                                 constraintName="asset_site_id_fkey"
+                                 referencedTableName="organizations" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20240901-1234-add-path-to-asset-table" author="M.Karimi">
+        <addColumn tableName="assets">
+            <column name="path" type="VARCHAR"></column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

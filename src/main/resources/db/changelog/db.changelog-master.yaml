@@ -26,3 +26,12 @@ databaseChangeLog:
   - include:
       file: 20240818-0933-add-reason-to-days-off-table.xml
       relativeToChangelogFile: true
+  - include:
+      file: 20240831-1733-create-asset-table.xml
+      relativeToChangelogFile: true
+  - include:
+      file: 20240921-2230-rename-country-code-to-country.xml
+      relativeToChangelogFile: true
+  - include:
+      file: 20240921-2330-add-avatar-id-to-user-table.xml
+      relativeToChangelogFile: true

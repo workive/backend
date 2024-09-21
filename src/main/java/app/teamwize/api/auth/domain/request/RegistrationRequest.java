@@ -3,8 +3,6 @@ package app.teamwize.api.auth.domain.request;
 
 import app.teamwize.api.base.validator.PhoneNumber;
 import app.teamwize.api.base.validator.TimeZone;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -36,7 +34,7 @@ public record RegistrationRequest(
         @Nonnull
         @NotBlank(message = "organization.country.blank")
         @Size(min = 2, max = 2, message = "organization.country.size")
-        String countryCode,
+        String country,
 
         @Nullable
         @TimeZone(message = "site.timezone.invalid")

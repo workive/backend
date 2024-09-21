@@ -1,12 +1,12 @@
 package app.teamwize.api.user.service;
 
+import app.teamwize.api.assets.domain.exception.AssetNotFoundException;
+import app.teamwize.api.assets.service.AssetService;
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.organization.service.OrganizationService;
-import app.teamwize.api.team.domain.entity.Team;
 import app.teamwize.api.user.exception.*;
 import app.teamwize.api.auth.domain.AuthUserDetails;
-import app.teamwize.api.organization.domain.entity.Organization;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
 import app.teamwize.api.team.service.TeamService;
 import app.teamwize.api.user.domain.UserRole;
@@ -39,6 +39,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TeamService teamService;
+    private final AssetService assetService;
 
     public void checkIfUserExists(String email) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(email)) {
@@ -75,7 +76,7 @@ public class UserService {
                 .setLastName(request.lastName())
                 .setPhone(request.phone())
                 .setTimezone(request.timezone())
-                .setCountryCode(null)
+                .setCountry(null)
                 .setTeam(team)
                 .setOrganization(organization);
         user.setTeam(team);
@@ -101,7 +102,7 @@ public class UserService {
                 .setLastName(request.lastName())
                 .setPhone(request.phone())
                 .setTimezone(request.timezone())
-                .setCountryCode(request.countryCode())
+                .setCountry(request.country())
                 .setTeam(team)
                 .setOrganization(organization);
 
@@ -112,7 +113,7 @@ public class UserService {
     }
 
     @Transactional
-    public User partiallyUpdateUser(Long organizationId, Long userId, UserUpdateRequest request) throws UserNotFoundException, UserAlreadyExistsException {
+    public User partiallyUpdateUser(Long organizationId, Long userId, UserUpdateRequest request) throws UserNotFoundException, UserAlreadyExistsException, AssetNotFoundException {
         var user = getById(organizationId, userId);
 
         if (request.getEmail() != null) {
@@ -128,6 +129,12 @@ public class UserService {
         if (request.getPhone() != null) {
             request.getPhone().ifPresent(user::setPhone);
         }
+
+        if (request.getAvatarAssetId() != null && request.getAvatarAssetId().isPresent()) {
+            var asset = assetService.getAsset(organizationId, request.getAvatarAssetId().get());
+            user.setAvatar(asset);
+        }
+
         return userRepository.update(user);
     }
 

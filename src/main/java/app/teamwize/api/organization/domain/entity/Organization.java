@@ -31,7 +31,7 @@ public class Organization extends BaseAuditEntity {
     private Long id;
     private String name;
 
-    private String countryCode;
+    private String country;
 
     private String timezone;
 
