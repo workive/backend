@@ -2,15 +2,35 @@ version: '3'
 
 services:
   postgres:
-    image: postgres:14-bullseye
-    container_name: db-postgres
+    image: "postgres:14-bullseye"
+    container_name: teamwize-postgres
+    networks:
+      - teamwize-network
     ports:
-      - '5433:5432'
+      - '5430:5432'
     environment:
-      POSTGRES_DB: workive-db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: teamwize-db
+      POSTGRES_USER: pg-admin
+      POSTGRES_PASSWORD: pg-admin
       PGDATA: /data/postgres
     volumes:
-      - ./data/db-pg:/data/postgres
-
+      - ./data:/data/postgres
+  api:
+    image: "ghcr.io/teamwize/api:dev"
+    container_name: teamwize-api
+    networks:
+      - teamwize-network
+    ports:
+      - '8001:80'
+    env_file:
+      - .env
+  app:
+    image: "ghcr.io/teamwize/dashboard-app:latest"
+    container_name: teamwize-app
+    networks:
+      - teamwize-network
+    ports:
+      - '8000:80'
+networks:
+  teamwize-network:
+    external: true
