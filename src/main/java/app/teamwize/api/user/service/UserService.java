@@ -91,9 +91,11 @@ public class UserService {
 
     @Transactional
     public User createUser(Long organizationId, Long inviterUserId, UserCreateRequest request)
-            throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException, UserNotFoundException, PermissionDeniedException {
+            throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException, UserNotFoundException, PermissionDeniedException, LeaveTypeNotFoundException {
         var organization = organizationService.getOrganization(organizationId);
         var team = teamService.getTeam(organizationId, request.teamId());
+        var leavePolicy = leavePolicyService.getLeavePolicy(organizationId, request.leavePolicyId());
+
         checkIfUserExists(request.email());
         var inviterUser = userRepository.findById(inviterUserId).orElseThrow(() -> new UserNotFoundException(organizationId, inviterUserId));
         if (inviterUser.getRole() != UserRole.ORGANIZATION_ADMIN) {
@@ -109,7 +111,8 @@ public class UserService {
                 .setTimezone(request.timezone())
                 .setCountry(request.country())
                 .setTeam(team)
-                .setOrganization(organization);
+                .setOrganization(organization)
+                .setLeavePolicy(leavePolicy);
 
         if (request.password() != null && !request.password().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.password()));

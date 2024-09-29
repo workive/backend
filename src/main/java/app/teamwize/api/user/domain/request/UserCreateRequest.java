@@ -11,6 +11,6 @@ public record UserCreateRequest(
         UserRole role,
         String timezone,
         String country,
-        Long teamId
-) {
+        Long teamId,
+        Long leavePolicyId) {
 }
