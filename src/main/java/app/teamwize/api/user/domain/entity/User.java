@@ -2,6 +2,7 @@ package app.teamwize.api.user.domain.entity;
 
 
 import app.teamwize.api.assets.domain.entity.Asset;
+import app.teamwize.api.leavepolicy.model.entity.LeavePolicy;
 import app.teamwize.api.user.domain.UserRole;
 import app.teamwize.api.user.domain.UserStatus;
 import app.teamwize.api.base.domain.entity.BaseAuditEntity;
@@ -40,6 +41,9 @@ public class User extends BaseAuditEntity {
     private UserStatus status;
     @ManyToOne(fetch = FetchType.LAZY)
     private Asset avatar;
+
+    @ManyToOne
+    private LeavePolicy leavePolicy;
 
     public User(Long userId) {
         this.id = userId;

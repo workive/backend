@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="20240928-1530-create-leave-policy-table" author="M.Karimi">
+        <createTable tableName="leave_policies">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organization_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createSequence sequenceName="leave_policy_id_seq" startValue="1" incrementBy="1"/>
+
+        <addForeignKeyConstraint
+                baseTableName="leave_policies"
+                baseColumnNames="organization_id"
+                referencedTableName="organizations"
+                referencedColumnNames="id"
+                constraintName="leave_type_organization_id_fkey"/>
+
+        <addColumn tableName="users">
+            <column type="BIGINT" name="leave_policy_id"/>
+        </addColumn>
+
+        <addForeignKeyConstraint
+                baseTableName="users"
+                baseColumnNames="leave_policy_id"
+                referencedTableName="leave_policies"
+                referencedColumnNames="id"
+                constraintName="users_leave_policy_id_fkey"/>
+    </changeSet>
+
+    <changeSet id="20240928-1530-change-leave-type-relation-to-policy-table" author="M.Karimi">
+        <addColumn tableName="leave_types">
+            <column name="policy_id" type="BIGINT"/>
+        </addColumn>
+        <dropForeignKeyConstraint baseTableName="leave_types" constraintName="leave_type_organization_id_fkey"/>
+        <dropColumn tableName="leave_types" columnName="organization_id"/>
+        <addForeignKeyConstraint
+                baseTableName="leave_types"
+                baseColumnNames="policy_id"
+                referencedTableName="leave_policies"
+                referencedColumnNames="id"
+                constraintName="leave_type_policy_id_fkey"/>
+    </changeSet>
+
+    <changeSet id="20240928-1830-add-is-default-to-leave-policy-table" author="Mohsen.K">
+        <addColumn tableName="leave_policies">
+            <column name="is_default" type="BOOL" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

@@ -3,6 +3,8 @@ package app.teamwize.api.user.service;
 import app.teamwize.api.assets.domain.exception.AssetNotFoundException;
 import app.teamwize.api.assets.service.AssetService;
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
+import app.teamwize.api.leavepolicy.exception.LeaveTypeNotFoundException;
+import app.teamwize.api.leavepolicy.service.LeavePolicyService;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.organization.service.OrganizationService;
 import app.teamwize.api.user.exception.*;
@@ -40,6 +42,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final TeamService teamService;
     private final AssetService assetService;
+    private final LeavePolicyService leavePolicyService;
 
     public void checkIfUserExists(String email) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(email)) {
@@ -64,10 +67,11 @@ public class UserService {
     }
 
     @Transactional
-    public User createOrganizationAdmin(Long organizationId, Long teamId, AdminUserCreateRequest request) throws UserAlreadyExistsException, TeamNotFoundException, OrganizationNotFoundException {
+    public User createOrganizationAdmin(Long organizationId, Long teamId, AdminUserCreateRequest request) throws UserAlreadyExistsException, TeamNotFoundException, OrganizationNotFoundException, LeaveTypeNotFoundException {
         var organization = organizationService.getOrganization(organizationId);
         checkIfUserExists(request.email());
         var team = teamService.getTeam(organizationId, teamId);
+        var leavePolicy = leavePolicyService.getLeavePolicy(organizationId, request.leavePolicyId());
         var user = new User()
                 .setStatus(UserStatus.ENABLED)
                 .setEmail(request.email())
@@ -76,9 +80,10 @@ public class UserService {
                 .setLastName(request.lastName())
                 .setPhone(request.phone())
                 .setTimezone(request.timezone())
-                .setCountry(null)
+                .setCountry(request.country())
                 .setTeam(team)
-                .setOrganization(organization);
+                .setOrganization(organization)
+                .setLeavePolicy(leavePolicy);
         user.setTeam(team);
         user.setPassword(passwordEncoder.encode(request.password()));
         return userRepository.merge(user);

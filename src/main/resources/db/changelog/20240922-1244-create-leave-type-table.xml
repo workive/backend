@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="20240922-1244-create-leave-type-table" author="M.Karimi">
+        <createTable tableName="leave_types">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cycle" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="requires_approval" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organization_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+        </createTable>
+
+        <createSequence sequenceName="leave_type_id_seq" startValue="1" incrementBy="1"/>
+
+        <addForeignKeyConstraint
+                baseTableName="leave_types"
+                baseColumnNames="organization_id"
+                referencedTableName="organizations"
+                referencedColumnNames="id"
+                constraintName="leave_type_organization_id_fkey"/>
+    </changeSet>
+
+    <changeSet id="20240922-1630-rename-days-off-to-leave-and-replace-type-with-leave-type" author="M.Karimi">
+        <renameTable oldTableName="days_off" newTableName="leaves"/>
+        <dropColumn tableName="leaves" columnName="type"/>
+        <addColumn tableName="leaves">
+            <column name="type_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addForeignKeyConstraint
+                baseTableName="leaves"
+                baseColumnNames="type_id"
+                referencedTableName="leave_types"
+                referencedColumnNames="id"
+                constraintName="leave_type_leave_types_id_fkey"/>
+    </changeSet>
+    <changeSet id="20240928-1130-add-duration-to-leave-table" author="M.Karimi">
+        <addColumn tableName="leaves">
+            <column name="duration" type="FLOAT"/>
+        </addColumn>
+
+    </changeSet>
+</databaseChangeLog>

@@ -7,7 +7,7 @@ services:
     networks:
       - teamwize-network
     ports:
-      - '5430:5432'
+      - '8002:5432'
     environment:
       POSTGRES_DB: teamwize-db
       POSTGRES_USER: pg-admin

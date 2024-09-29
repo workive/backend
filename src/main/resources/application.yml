@@ -46,15 +46,17 @@ spring:
   profiles:
     active: dev
   datasource:
-    password: admin
-    username: postgres
-    url: jdbc:postgresql://localhost:5430/workive-db
+    password: pg-admin
+    username: pg-admin
+    url: jdbc:postgresql://localhost:8002/teamwize-db
   jackson:
     property-naming-strategy: SNAKE_CASE
   docker:
     compose:
       lifecycle-management: start_only
       enabled: true
+      start:
+        command: up
   servlet:
     multipart:
       max-file-size: "100MB"

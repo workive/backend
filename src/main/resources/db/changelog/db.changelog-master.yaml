@@ -35,3 +35,9 @@ databaseChangeLog:
   - include:
       file: 20240921-2330-add-avatar-id-to-user-table.xml
       relativeToChangelogFile: true
+  - include:
+      file: 20240922-1244-create-leave-type-table.xml
+      relativeToChangelogFile: true
+  - include:
+      file: 20240928-1530-create-leave-policy-table.xml
+      relativeToChangelogFile: true

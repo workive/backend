@@ -2,6 +2,7 @@ package app.teamwize.api.user.domain.response;
 
 
 import app.teamwize.api.assets.domain.model.response.AssetCompactResponse;
+import app.teamwize.api.leavepolicy.rest.model.response.LeavePolicyCompactResponse;
 import app.teamwize.api.team.domain.response.TeamCompactResponse;
 import app.teamwize.api.user.domain.UserRole;
 import app.teamwize.api.user.domain.UserStatus;
@@ -23,6 +24,7 @@ public record UserResponse(
         @Nullable String country,
         @Nonnull OrganizationCompactResponse organization,
         @Nonnull TeamCompactResponse team,
-        @Nonnull AssetCompactResponse avatar
+        @Nonnull AssetCompactResponse avatar,
+        @Nonnull LeavePolicyCompactResponse leavePolicy
 ) {
 }
