@@ -53,4 +53,9 @@ public class HolidayService {
         var endDate = startDate.plusYears(1);
         return holidayRepository.findByOrganizationIdAndCountryAndDateIsBetween(organizationId, country, startDate, endDate);
     }
+
+
+    public List<Holiday> getHolidays(Long organizationId, LocalDate startDate,LocalDate endDate, String country) {
+        return holidayRepository.findByOrganizationIdAndCountryAndDateIsBetween(organizationId, country, startDate, endDate);
+    }
 }

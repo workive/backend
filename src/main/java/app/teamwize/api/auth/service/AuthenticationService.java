@@ -3,6 +3,8 @@ package app.teamwize.api.auth.service;
 
 import app.teamwize.api.auth.domain.request.LoginRequest;
 import app.teamwize.api.base.exception.BaseException;
+import app.teamwize.api.leavepolicy.exception.LeaveTypeNotFoundException;
+import app.teamwize.api.leavepolicy.service.LeavePolicyService;
 import app.teamwize.api.organization.service.OrganizationService;
 import app.teamwize.api.user.domain.request.AdminUserCreateRequest;
 import app.teamwize.api.user.exception.UserAlreadyExistsException;
@@ -39,11 +41,13 @@ public class AuthenticationService implements UserDetailsService {
     private final ApplicationEventPublisher eventPublisher;
     private final UserMapper userMapper;
     private final TeamService teamService;
+    private final LeavePolicyService leavePolicyService;
 
 
     @Transactional(rollbackFor = BaseException.class)
-    public AuthenticationResponse register(RegistrationRequest request) throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException {
-        var organization = organizationService.registerOrganization(new OrganizationCreateRequest(request.organizationName(),request.country(), request.timezone()));
+    public AuthenticationResponse register(RegistrationRequest request) throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException, LeaveTypeNotFoundException {
+        var organization = organizationService.registerOrganization(new OrganizationCreateRequest(request.organizationName(), request.country(), request.timezone()));
+        var leavePolicy = leavePolicyService.createDefaultLeavePolicy(organization.getId());
         var team = teamService.createTeam(organization.getId(), new TeamCreateRequest("Default", null));
         var registerRequest = new AdminUserCreateRequest(
                 request.email(),
@@ -51,10 +55,14 @@ public class AuthenticationService implements UserDetailsService {
                 request.firstName(),
                 request.lastName(),
                 request.phone(),
-                request.timezone()
+                request.timezone(),
+                request.country(),
+                leavePolicy.getId()
         );
-        var user = userService.createOrganizationAdmin(organization.getId(), team.getId(),registerRequest);
+
+        var user = userService.createOrganizationAdmin(organization.getId(), team.getId(), registerRequest);
         eventPublisher.publishEvent(new OrganizationCreatedEvent(organization, userMapper.toUserResponse(user)));
+
 
         var accessToken = tokenService.generateAccessToken(
                 user.getId().toString(),

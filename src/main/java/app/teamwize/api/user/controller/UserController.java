@@ -6,6 +6,7 @@ import app.teamwize.api.auth.service.SecurityService;
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
 import app.teamwize.api.base.domain.model.response.PagedResponse;
 import app.teamwize.api.base.mapper.PagedResponseMapper;
+import app.teamwize.api.leavepolicy.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
 import app.teamwize.api.user.domain.request.*;
@@ -32,8 +33,8 @@ public class UserController {
 
     @GetMapping
     public PagedResponse<UserResponse> getUsers(@ParameterObject @Valid UserFilterRequest filter,
-                                                @ParameterObject @Valid PaginationRequest page){
-        var pagedUsers = userService.getUsers(securityService.getUserOrganizationId(),filter,page);
+                                                @ParameterObject @Valid PaginationRequest page) {
+        var pagedUsers = userService.getUsers(securityService.getUserOrganizationId(), filter, page);
         return pagedResponseMapper.toPagedResponse(
                 userMapper.toUserResponses(pagedUsers.getContent()),
                 pagedUsers.getNumber(),
@@ -44,7 +45,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserResponse createUser(@RequestBody UserCreateRequest request) throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException, UserNotFoundException, PermissionDeniedException {
+    public UserResponse createUser(@RequestBody UserCreateRequest request) throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException, UserNotFoundException, PermissionDeniedException, LeaveTypeNotFoundException {
         var user = userService.createUser(securityService.getUserOrganizationId(), securityService.getUserId(), request);
         return userMapper.toUserResponse(user);
     }
@@ -72,7 +73,6 @@ public class UserController {
         var organizationId = securityService.getUserOrganizationId();
         return userMapper.toUserResponse(userService.partiallyUpdateUser(organizationId, userId, request));
     }
-
 
 
     @PatchMapping("{userId}/status")
