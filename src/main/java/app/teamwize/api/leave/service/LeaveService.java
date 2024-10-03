@@ -15,12 +15,15 @@ import app.teamwize.api.leavepolicy.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.leavepolicy.model.UserLeaveBalance;
 import app.teamwize.api.leavepolicy.model.entity.LeaveType;
 import app.teamwize.api.leavepolicy.service.LeavePolicyService;
+import app.teamwize.api.notification.model.Email;
+import app.teamwize.api.notification.service.EmailService;
 import app.teamwize.api.organization.domain.entity.Organization;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.organization.service.OrganizationService;
 import app.teamwize.api.user.domain.entity.User;
 import app.teamwize.api.user.exception.UserNotFoundException;
 import app.teamwize.api.user.service.UserService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +37,7 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static app.teamwize.api.leave.repository.LeaveSpecifications.*;
@@ -47,6 +51,7 @@ public class LeaveService {
     private final HolidayService holidayService;
     private final OrganizationService organizationService;
     private final LeavePolicyService leavePolicyService;
+    private final EmailService emailService;
 
     @Transactional
     public Leave createLeave(Long organizationId, Long userId, LeaveCreateRequest request) throws UserNotFoundException, LeaveTypeNotFoundException, OrganizationNotFoundException {
@@ -98,12 +103,14 @@ public class LeaveService {
 
 
     @Transactional
-    public Leave updateLeave(Long userId, Long id, LeaveUpdateRequest request) throws LeaveNotFoundException, LeaveUpdateStatusFailedException {
+    public Leave updateLeave(Long userId, Long id, LeaveUpdateRequest request) throws LeaveNotFoundException, LeaveUpdateStatusFailedException, UserNotFoundException, MessagingException {
         var dayOff = getById(userId, id);
+        var user = userService.getUser(dayOff.getOrganization().getId(), userId);
         if (dayOff.getStatus() != LeaveStatus.PENDING) {
             throw new LeaveUpdateStatusFailedException(id, dayOff.getStatus());
         }
         dayOff.setStatus(request.status());
+        emailService.sendEmail(new Email(user.getEmail(), "Your leave status changed :" + request.status().toString(), "welcome", Map.of("recipient", user.getFirstName())));
         return leaveRepository.update(dayOff);
     }
 

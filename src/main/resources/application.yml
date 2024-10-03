@@ -1,6 +1,9 @@
 server:
   port: 8001
 app:
+  email:
+    company-name: "Your Company Name"
+    templates-path: "classpath:/templates/"
   storage:
     temp-directory: ${java.io.tmpdir}
     base-preview-url: https://teamwize.app/assets/preview
@@ -27,6 +30,17 @@ app:
         secret: THIS_IS_THE_DEFAULT_RANDOM_STRING
         expiration-in-ms: '604800000'
 spring:
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   jpa:
     properties:
       hibernate:
