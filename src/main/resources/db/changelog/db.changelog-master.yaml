@@ -41,3 +41,6 @@ databaseChangeLog:
   - include:
       file: 20240928-1530-create-leave-policy-table.xml
       relativeToChangelogFile: true
+  - include:
+      file: 20241005-1300-create-leave-policy-activated-table.xml
+      relativeToChangelogFile: true

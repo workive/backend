@@ -6,7 +6,7 @@ import app.teamwize.api.auth.service.SecurityService;
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
 import app.teamwize.api.base.domain.model.response.PagedResponse;
 import app.teamwize.api.base.mapper.PagedResponseMapper;
-import app.teamwize.api.leavepolicy.exception.LeaveTypeNotFoundException;
+import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
 import app.teamwize.api.user.domain.request.*;

@@ -3,8 +3,8 @@ package app.teamwize.api.auth.service;
 
 import app.teamwize.api.auth.domain.request.LoginRequest;
 import app.teamwize.api.base.exception.BaseException;
-import app.teamwize.api.leavepolicy.exception.LeaveTypeNotFoundException;
-import app.teamwize.api.leavepolicy.service.LeavePolicyService;
+import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
+import app.teamwize.api.leave.service.LeavePolicyService;
 import app.teamwize.api.organization.service.OrganizationService;
 import app.teamwize.api.user.domain.request.AdminUserCreateRequest;
 import app.teamwize.api.user.exception.UserAlreadyExistsException;
