@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="20241005-1300-create-leave-policy-activated-table" author="M.Karimi">
+        <createSequence sequenceName="leave_policy_activated_type_id_seq" startValue="1" incrementBy="5"/>
+        <createTable tableName="leave_policy_activated_types">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="policy_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="leave_policy_activated_types"
+                baseColumnNames="policy_id"
+                referencedTableName="leave_policies"
+                referencedColumnNames="id"
+                constraintName="leave_policy_activated_types_policy_id_fkey"/>
+
+        <addForeignKeyConstraint
+                baseTableName="leave_policy_activated_types"
+                baseColumnNames="type_id"
+                referencedTableName="leave_types"
+                referencedColumnNames="id"
+                constraintName="leave_policy_activated_types_type_id_fkey"/>
+
+
+    </changeSet>
+    <changeSet id="20241005-1300-refactor-leave-leave-policy-leave-type-table" author="M.Karimi">
+        <sql>
+            update users
+            set leave_policy_id=null;
+            delete
+            from leaves;
+            delete
+            from leave_types;
+            delete
+            from leave_policies;
+        </sql>
+        <dropForeignKeyConstraint baseTableName="leave_types" constraintName="leave_type_policy_id_fkey"/>
+        <dropColumn tableName="leave_types" columnName="amount"/>
+        <dropColumn tableName="leave_types" columnName="requires_approval"/>
+        <dropColumn tableName="leave_types" columnName="policy_id"/>
+
+        <addColumn tableName="leave_types">
+            <column name="organization_id" type="BIGINT">
+            </column>
+        </addColumn>
+
+        <addForeignKeyConstraint
+                baseTableName="leave_types"
+                baseColumnNames="organization_id"
+                referencedTableName="organizations"
+                referencedColumnNames="id"
+                constraintName="leave_type_organization_id_fkey"/>
+
+        <dropForeignKeyConstraint baseTableName="leaves" constraintName="leave_type_leave_types_id_fkey"/>
+
+        <addForeignKeyConstraint
+                baseTableName="leaves"
+                baseColumnNames="type_id"
+                referencedTableName="leave_policy_activated_types"
+                referencedColumnNames="id"
+                constraintName="leave_type_leave_policy_activated_types_id_fkey"/>
+
+    </changeSet>
+    <changeSet id="20241005-1300-add-remained-columns-to-leave-policy-activated-table" author="Mohsen.K">
+        <addColumn tableName="leave_policy_activated_types">
+            <column name="amount" type="INT"/>
+            <column name="requires_approval" type="BOOL"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="20241005-1860-remove-name-column-in-leave-policy-activated-table" author="Mohsen.K">
+        <dropColumn tableName="leave_policy_activated_types" columnName="name"/>
+    </changeSet>
+</databaseChangeLog>
