@@ -1,8 +1,8 @@
 package app.teamwize.api.leave.repository;
 
 
-import app.teamwize.api.leave.domain.entity.Leave;
-import app.teamwize.api.leave.domain.LeaveStatus;
+import app.teamwize.api.leave.model.entity.Leave;
+import app.teamwize.api.leave.model.LeaveStatus;
 import app.teamwize.api.user.domain.entity.User;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;

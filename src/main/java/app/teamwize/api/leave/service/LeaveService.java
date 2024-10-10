@@ -3,27 +3,22 @@ package app.teamwize.api.leave.service;
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
 import app.teamwize.api.holiday.domain.entity.Holiday;
 import app.teamwize.api.holiday.service.HolidayService;
-import app.teamwize.api.leave.domain.LeaveStatus;
-import app.teamwize.api.leave.domain.entity.Leave;
-import app.teamwize.api.leave.domain.request.LeaveCreateRequest;
-import app.teamwize.api.leave.domain.request.LeaveFilterRequest;
-import app.teamwize.api.leave.domain.request.LeaveUpdateRequest;
+import app.teamwize.api.leave.model.LeaveStatus;
+import app.teamwize.api.leave.model.command.LeaveCreateCommand;
+import app.teamwize.api.leave.model.command.LeaveUpdateCommand;
+import app.teamwize.api.leave.model.entity.Leave;
+import app.teamwize.api.leave.rest.model.request.LeaveFilterRequest;
 import app.teamwize.api.leave.exception.LeaveNotFoundException;
 import app.teamwize.api.leave.exception.LeaveUpdateStatusFailedException;
 import app.teamwize.api.leave.repository.LeaveRepository;
-import app.teamwize.api.leavepolicy.exception.LeaveTypeNotFoundException;
-import app.teamwize.api.leavepolicy.model.UserLeaveBalance;
-import app.teamwize.api.leavepolicy.model.entity.LeaveType;
-import app.teamwize.api.leavepolicy.service.LeavePolicyService;
-import app.teamwize.api.notification.model.Email;
-import app.teamwize.api.notification.service.EmailService;
+import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
+import app.teamwize.api.leave.model.UserLeaveBalance;
 import app.teamwize.api.organization.domain.entity.Organization;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.organization.service.OrganizationService;
 import app.teamwize.api.user.domain.entity.User;
 import app.teamwize.api.user.exception.UserNotFoundException;
 import app.teamwize.api.user.service.UserService;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,25 +49,25 @@ public class LeaveService {
     private final EmailService emailService;
 
     @Transactional
-    public Leave createLeave(Long organizationId, Long userId, LeaveCreateRequest request) throws UserNotFoundException, LeaveTypeNotFoundException, OrganizationNotFoundException {
+    public Leave createLeave(Long organizationId, Long userId, LeaveCreateCommand command) throws UserNotFoundException, LeaveTypeNotFoundException, OrganizationNotFoundException {
         var organization = organizationService.getOrganization(organizationId);
         var user = userService.getUser(organizationId, userId);
         var leavePolicy = leavePolicyService.getLeavePolicy(organizationId, user.getLeavePolicy().getId());
 
-        var leaveType = leavePolicy.getTypes().stream()
-                .filter(type -> type.getId().equals(request.typeId()))
+        var leaveType = leavePolicy.getActivatedTypes().stream()
+                .filter(type -> type.getId().equals(command.activatedTypeId()))
                 .findFirst()
-                .orElseThrow(() -> new LeaveTypeNotFoundException(request.typeId()));
+                .orElseThrow(() -> new LeaveTypeNotFoundException(command.activatedTypeId()));
 
         var dayOff = new Leave()
-                .setReason(request.reason())
-                .setStartAt(request.start())
-                .setEndAt(request.end())
+                .setReason(command.reason())
+                .setStartAt(command.start())
+                .setEndAt(command.end())
                 .setUser(user)
-                .setOrganization(new Organization(organizationId))
+                .setOrganization(organization)
                 .setStatus(LeaveStatus.PENDING)
                 .setType(leaveType)
-                .setDuration(calculateLeaveDuration(organization, leaveType, user, request.start(), request.end()));
+                .setDuration(calculateLeaveDuration(organization, user, command.start(), command.end()));
         return leaveRepository.persist(dayOff);
     }
 
@@ -103,7 +98,7 @@ public class LeaveService {
 
 
     @Transactional
-    public Leave updateLeave(Long userId, Long id, LeaveUpdateRequest request) throws LeaveNotFoundException, LeaveUpdateStatusFailedException, UserNotFoundException, MessagingException {
+    public Leave updateLeave(Long userId, Long id, LeaveUpdateCommand request) throws LeaveNotFoundException, LeaveUpdateStatusFailedException {
         var dayOff = getById(userId, id);
         var user = userService.getUser(dayOff.getOrganization().getId(), userId);
         if (dayOff.getStatus() != LeaveStatus.PENDING) {
@@ -132,19 +127,21 @@ public class LeaveService {
         var policy = leavePolicyService.getLeavePolicy(organizationId, user.getLeavePolicy().getId());
         var startedAt = user.getCreatedAt().toLocalDate();
         var result = new ArrayList<UserLeaveBalance>();
-        for (var type : policy.getTypes()) {
-            var usedAmount = this.getTotalDuration(organizationId, userId, type.getId(), LeaveStatus.ACCEPTED);
-            var totalAmount = switch (type.getCycle()) {
+        for (var activatedType : policy.getActivatedTypes()) {
+            var usedAmount = this.getTotalDuration(organizationId, userId, activatedType.getId(), LeaveStatus.ACCEPTED);
+            var totalAmount = switch (activatedType.getType().getCycle()) {
                 case UNLIMITED -> Integer.MAX_VALUE;
-                case PER_MONTH -> Period.between(startedAt, LocalDate.now()).toTotalMonths() * type.getAmount();
-                case PER_YEAR -> (Period.between(startedAt, LocalDate.now()).toTotalMonths() / 12) * type.getAmount();
+                case PER_MONTH ->
+                        Period.between(startedAt, LocalDate.now()).toTotalMonths() * activatedType.getAmount();
+                case PER_YEAR ->
+                        (Period.between(startedAt, LocalDate.now()).toTotalMonths() / 12) * activatedType.getAmount();
             };
-            result.add(new UserLeaveBalance(type, usedAmount.longValue(), totalAmount, startedAt));
+            result.add(new UserLeaveBalance(activatedType, usedAmount.longValue(), totalAmount, startedAt));
         }
         return result;
     }
 
-    private Float calculateLeaveDuration(Organization organization, LeaveType type, User user, LocalDateTime start, LocalDateTime end) {
+    private Float calculateLeaveDuration(Organization organization, User user, LocalDateTime start, LocalDateTime end) {
         var startDate = start.toLocalDate();
         var endDate = end.toLocalDate();
 
