@@ -1,14 +1,14 @@
-package app.teamwize.api.auth.controller;
+package app.teamwize.api.auth.rest.controller;
 
 
-import app.teamwize.api.auth.domain.request.LoginRequest;
+import app.teamwize.api.auth.rest.model.request.LoginRequest;
 import app.teamwize.api.auth.service.AuthenticationService;
 import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
 import app.teamwize.api.user.exception.UserAlreadyExistsException;
-import app.teamwize.api.auth.domain.request.RegistrationRequest;
-import app.teamwize.api.auth.domain.response.AuthenticationResponse;
+import app.teamwize.api.auth.rest.model.request.RegistrationRequest;
+import app.teamwize.api.auth.rest.model.response.AuthenticationResponse;
 import app.teamwize.api.auth.exception.InvalidCredentialException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

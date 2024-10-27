@@ -1,4 +1,4 @@
-package app.teamwize.api.auth.domain;
+package app.teamwize.api.auth.model;
 
 import lombok.Data;
 

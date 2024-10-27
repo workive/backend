@@ -24,4 +24,32 @@ public class MailConfig {
 
         return mailSender;
     }
+
+//    @Bean
+//    public JobDetail jobDetail() {
+//        return JobBuilder.newJob().ofType(EmailSenderJob.class)
+//                .storeDurably()
+//                .withIdentity("EmailSenderJob")
+//                .withDescription("Invoke Sample Job service...")
+//                .build();
+//    }
+//
+//    @Bean
+//    public Trigger trigger(JobDetail job) {
+//        return TriggerBuilder.newTrigger().forJob(job)
+//                .withIdentity("EmailSenderJobTrigger")
+//                .withDescription("Sample trigger")
+//                .withSchedule(simpleSchedule().repeatForever().withIntervalInMinutes(2))
+//                .build();
+//    }
+//
+//
+//    @Bean
+//    public Scheduler scheduler(Trigger trigger, JobDetail job, SchedulerFactoryBean factory)
+//            throws SchedulerException {
+//        Scheduler scheduler = factory.getScheduler();
+//        scheduler.scheduleJob(job, trigger);
+//        scheduler.start();
+//        return scheduler;
+//    }
 }

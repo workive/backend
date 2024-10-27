@@ -1,0 +1,44 @@
+{% extends "base" %}
+
+{% block content %}
+
+<h1>Leave Request Status</h1>
+
+<p>Dear {{ employeeName }},</p>
+
+{% if status == 'ACCEPTED' %}
+<p class="status-accepted">Your leave request has been <strong>Accepted</strong>.</p>
+{% else if status == 'CREATED' %}
+<p class="status-accepted">Your leave request has been <strong>Created</strong>.</p>
+
+{% else %}
+<p class="status-rejected">Unfortunately, your leave request has been <strong>Rejected</strong>.</p>
+{% endif %}
+
+<div style="margin-top: 20px;">
+    <div style="margin-bottom: 10px;">
+        <strong style="display: inline-block;margin-right:5px;">Leave Type:</strong> {{ leaveType }}
+    </div>
+    <div style="margin-bottom: 10px;">
+        <strong style="display: inline-block; margin-right:5px;">Start Date:</strong> {{ startDate }}
+    </div>
+    <div style="margin-bottom: 10px;">
+        <strong style="display: inline-block; margin-right:5px;">End Date:</strong> {{ endDate }}
+    </div>
+    <div style="margin-bottom: 10px;">
+        <strong style="display: inline-block;margin-right:5px;">Status:</strong> {{ status}}
+    </div>
+    {% if reason is not empty %}
+    <div style="margin-bottom: 10px;">
+        <strong style="display: inline-block;margin-right:5px;">Reason:</strong> {{ reason }}
+    </div>
+    {% endif %}
+</div>
+
+<p>If you have any questions, feel free to contact the HR department.</p>
+
+<div class="footer">
+    <p>This is an automated message from the Teamwize Application. Please do not reply.</p>
+</div>
+
+{% endblock %}

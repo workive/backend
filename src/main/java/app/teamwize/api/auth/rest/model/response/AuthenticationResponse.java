@@ -1,4 +1,4 @@
-package app.teamwize.api.auth.domain.response;
+package app.teamwize.api.auth.rest.model.response;
 
 import app.teamwize.api.user.domain.response.UserResponse;
 import lombok.AllArgsConstructor;

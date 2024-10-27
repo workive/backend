@@ -7,12 +7,10 @@ import java.util.Map;
  *
  * @param to Recipient's email address.
  * @param subject Subject of the email.
- * @param template Template name to be used (e.g., "welcome-email").
- * @param variables Map of variables to replace in the template.
+ * @param content Template name to be used (e.g., "welcome-email").
  */
 public record Email(
         String to,
         String subject,
-        String template,
-        Map<String, Object> variables
+        String content
 ) {}

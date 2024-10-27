@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import java.nio.charset.StandardCharsets;
 
@@ -18,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 public class EmailService {
 
     private final JavaMailSender mailSender;
-    private final TemplateEngine templateEngine;
 
     @Value("${app.email.company-name}")
     private String companyName;
@@ -42,15 +39,8 @@ public class EmailService {
         helper.setTo(email.to());
         helper.setSubject(email.subject());
 
-        // Prepare the evaluation context
-        var context = new Context();
-        context.setVariables(email.variables());
-        context.setVariable("company", companyName); // Inject companyName from application.yml
 
-        // Process the HTML template using Thymeleaf
-        var html = templateEngine.process(email.template() + ".html", context);
-
-        helper.setText(html, true); // Set to true for HTML
+        helper.setText(email.content(), true);
 
         mailSender.send(message);
     }

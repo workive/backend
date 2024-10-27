@@ -8,7 +8,7 @@ import app.teamwize.api.leave.service.LeavePolicyService;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.organization.service.OrganizationService;
 import app.teamwize.api.user.exception.*;
-import app.teamwize.api.auth.domain.AuthUserDetails;
+import app.teamwize.api.auth.model.AuthUserDetails;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
 import app.teamwize.api.team.service.TeamService;
 import app.teamwize.api.user.domain.UserRole;

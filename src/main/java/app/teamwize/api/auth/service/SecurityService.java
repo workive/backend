@@ -1,7 +1,7 @@
 package app.teamwize.api.auth.service;
 
 import app.teamwize.api.user.domain.UserRole;
-import app.teamwize.api.auth.domain.AuthUserDetails;
+import app.teamwize.api.auth.model.AuthUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;

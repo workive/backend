@@ -57,6 +57,7 @@ spring:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
     show-sql: true
     open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   profiles:
     active: dev
   datasource:
@@ -74,7 +75,6 @@ spring:
   servlet:
     multipart:
       max-file-size: "100MB"
-management:
   endpoints:
     web:
       exposure:
@@ -94,6 +94,10 @@ management:
       enabled: true
     info:
       enabled: true
+  batch:
+    jdbc:
+      isolation-level-for-create: serializable
+      platform: postgresql
 
 springdoc:
   swagger-ui:

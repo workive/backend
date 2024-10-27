@@ -35,7 +35,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+//	implementation 'org.springframework.boot:spring-boot-starter-batch'
+	implementation 'io.pebbletemplates:pebble:3.2.2'
 	implementation 'org.liquibase:liquibase-core'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
@@ -49,11 +50,6 @@ dependencies {
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 	implementation 'com.auth0:java-jwt:4.3.0'
 
-
-//	implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.12.770'
-
-
-
 	compileOnly 'com.google.code.findbugs:jsr305:3.0.1'
 	compileOnly 'com.google.code.findbugs:annotations:3.0.1'
 
@@ -63,10 +59,6 @@ dependencies {
 	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'org.testcontainers:postgresql'
 }
-
-//tasks.withType<Test> {
-//	useJUnitPlatform()
-//}
 
 jib {
 	from {

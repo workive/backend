@@ -1,0 +1,38 @@
+{% extends "base" %}
+
+{% block content %}
+
+<h1>New Leave Request</h1>
+
+<p>Dear Admin,</p>
+<p>One of your employees, <strong>{{ employeeName }}</strong>, has requested a leave.</p>
+
+<div style="margin-top: 20px;">
+    <div style="margin-bottom: 10px;">
+        <strong style="display: inline-block; width: 120px;">Employee:</strong> {{ employeeName }}
+    </div>
+    <div style="margin-bottom: 10px;">
+        <strong style="display: inline-block; width: 120px;">Leave Type:</strong> {{ leaveType }}
+    </div>
+    <div style="margin-bottom: 10px;">
+        <strong style="display: inline-block; width: 120px;">Start Date:</strong> {{ startDate }}
+    </div>
+    <div style="margin-bottom: 10px;">
+        <strong style="display: inline-block; width: 120px;">End Date:</strong> {{ endDate }}
+    </div>
+</div>
+
+<p>Please take a moment to review this leave request by clicking the button below:</p>
+
+<div style="text-align: center; margin-top: 20px;">
+    <a href="{{ actionLink }}"
+       style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; font-weight: bold; border-radius: 5px;">
+        View Request
+    </a>
+</div>
+
+<div style="margin-top: 30px; font-size: 12px; color: #888;">
+    <p>This is an automated message from the Leave Tracker Application. Please do not reply.</p>
+</div>
+
+{% endblock %}

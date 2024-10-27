@@ -16,6 +16,7 @@ import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.leave.rest.model.response.UserLeaveBalanceResponse;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.user.exception.UserNotFoundException;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -85,7 +86,7 @@ public class LeaveController {
     }
 
     @PutMapping("{id}")
-    public LeaveResponse updateDayOff(@PathVariable Long id, @RequestBody LeaveUpdateRequest request) throws LeaveNotFoundException, LeaveUpdateStatusFailedException {
+    public LeaveResponse updateDayOff(@PathVariable Long id, @RequestBody LeaveUpdateRequest request) throws LeaveNotFoundException, LeaveUpdateStatusFailedException, UserNotFoundException, MessagingException {
         return leaveMapper.toDayOffResponse(leaveService.updateLeave(securityService.getUserId(), id, leaveMapper.toUpdateCommand(request)));
     }
 

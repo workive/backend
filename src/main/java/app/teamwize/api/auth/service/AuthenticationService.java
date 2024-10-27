@@ -1,7 +1,7 @@
 package app.teamwize.api.auth.service;
 
 
-import app.teamwize.api.auth.domain.request.LoginRequest;
+import app.teamwize.api.auth.rest.model.request.LoginRequest;
 import app.teamwize.api.base.exception.BaseException;
 import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.leave.service.LeavePolicyService;
@@ -11,8 +11,8 @@ import app.teamwize.api.user.exception.UserAlreadyExistsException;
 import app.teamwize.api.user.exception.UserNotFoundException;
 import app.teamwize.api.user.mapper.UserMapper;
 import app.teamwize.api.user.service.UserService;
-import app.teamwize.api.auth.domain.request.RegistrationRequest;
-import app.teamwize.api.auth.domain.response.AuthenticationResponse;
+import app.teamwize.api.auth.rest.model.request.RegistrationRequest;
+import app.teamwize.api.auth.rest.model.response.AuthenticationResponse;
 import app.teamwize.api.auth.exception.InvalidCredentialException;
 import app.teamwize.api.organization.domain.event.OrganizationCreateRequest;
 import app.teamwize.api.organization.domain.event.OrganizationCreatedEvent;
@@ -26,6 +26,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,7 @@ public class AuthenticationService implements UserDetailsService {
     private final UserMapper userMapper;
     private final TeamService teamService;
     private final LeavePolicyService leavePolicyService;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Transactional(rollbackFor = BaseException.class)
@@ -78,6 +80,9 @@ public class AuthenticationService implements UserDetailsService {
     public AuthenticationResponse login(LoginRequest request) throws InvalidCredentialException {
         try {
             var user = userService.getUserByEmail(request.getEmail());
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                throw new InvalidCredentialException(request.getEmail());
+            }
             var accessToken = tokenService.generateAccessToken(
                     user.getId().toString(),
                     user.getOrganization().getId(),
@@ -87,8 +92,7 @@ public class AuthenticationService implements UserDetailsService {
             );
             var refreshToken = tokenService.generateRefreshToken(user.getId().toString(), LocalDateTime.now().plusDays(7));
             return new AuthenticationResponse(accessToken, refreshToken, userMapper.toUserResponse(user));
-
-        } catch (UserNotFoundException ex) {
+        } catch (BaseException ex) {
             throw new InvalidCredentialException(request.getEmail());
         }
     }

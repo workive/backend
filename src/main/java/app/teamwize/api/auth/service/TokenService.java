@@ -1,9 +1,9 @@
 package app.teamwize.api.auth.service;
 
 
-import app.teamwize.api.auth.domain.ActivationToken;
-import app.teamwize.api.auth.domain.JwtTokenType;
-import app.teamwize.api.auth.domain.ResetPasswordToken;
+import app.teamwize.api.auth.model.ActivationToken;
+import app.teamwize.api.auth.model.JwtTokenType;
+import app.teamwize.api.auth.model.ResetPasswordToken;
 import app.teamwize.api.user.domain.UserRole;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

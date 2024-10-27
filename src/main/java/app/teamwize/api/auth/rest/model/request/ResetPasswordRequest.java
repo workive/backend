@@ -1,4 +1,4 @@
-package app.teamwize.api.auth.domain.request;
+package app.teamwize.api.auth.rest.model.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

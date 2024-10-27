@@ -1,4 +1,4 @@
-package app.teamwize.api.auth.domain.request;
+package app.teamwize.api.auth.rest.model.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
