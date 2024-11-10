@@ -60,6 +60,8 @@ spring:
   servlet:
     multipart:
       max-file-size: "100MB"
+  liquibase:
+    change-log: classpath:/db/db.changelog-master.yaml
 management:
   endpoints:
     web:
@@ -89,4 +91,7 @@ springdoc:
   api-docs:
     enabled: true
     path: /swagger-ui/openapi.json
+
+
+
 

@@ -86,7 +86,7 @@ public class LeaveController {
 
     @PutMapping("{id}")
     public LeaveResponse updateDayOff(@PathVariable Long id, @RequestBody LeaveUpdateRequest request) throws LeaveNotFoundException, LeaveUpdateStatusFailedException {
-        return leaveMapper.toDayOffResponse(leaveService.updateLeave(securityService.getUserId(), id, leaveMapper.toUpdateCommand(request)));
+        return leaveMapper.toDayOffResponse(leaveService.updateLeave(securityService.getUserOrganizationId(), securityService.getUserId(), id, leaveMapper.toUpdateCommand(request)));
     }
 
     @GetMapping("{id}")

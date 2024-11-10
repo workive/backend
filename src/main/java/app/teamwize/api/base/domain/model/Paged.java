@@ -1,11 +1,12 @@
-package app.teamwize.api.base.domain.model.response;
-
+package app.teamwize.api.base.domain.model;
 
 import jakarta.annotation.Nonnull;
+import lombok.With;
 
 import java.util.List;
 
-public record PagedResponse<T>(
+@With
+public record Paged<T>(
         @Nonnull
         List<T> contents,
         @Nonnull

@@ -3,8 +3,11 @@ package app.teamwize.api.auth.service;
 
 import app.teamwize.api.auth.domain.request.LoginRequest;
 import app.teamwize.api.base.exception.BaseException;
+import app.teamwize.api.event.model.EventType;
+import app.teamwize.api.event.service.EventService;
 import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.leave.service.LeavePolicyService;
+import app.teamwize.api.organization.mapper.OrganizationMapper;
 import app.teamwize.api.organization.service.OrganizationService;
 import app.teamwize.api.user.domain.request.AdminUserCreateRequest;
 import app.teamwize.api.user.exception.UserAlreadyExistsException;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -38,10 +42,11 @@ public class AuthenticationService implements UserDetailsService {
     private final OrganizationService organizationService;
     private final TokenService tokenService;
     private final UserService userService;
-    private final ApplicationEventPublisher eventPublisher;
     private final UserMapper userMapper;
+    private final OrganizationMapper organizationMapper;
     private final TeamService teamService;
     private final LeavePolicyService leavePolicyService;
+    private final EventService eventService;
 
 
     @Transactional(rollbackFor = BaseException.class)
@@ -61,8 +66,11 @@ public class AuthenticationService implements UserDetailsService {
         );
 
         var user = userService.createOrganizationAdmin(organization.getId(), team.getId(), registerRequest);
-        eventPublisher.publishEvent(new OrganizationCreatedEvent(organization, userMapper.toUserResponse(user)));
 
+        eventService.emmit(organization.getId(), EventType.ORGANIZATION_CREATED, Map.of(
+                "user", userMapper.toUserResponse(user),
+                "organization", organizationMapper.toResponse(organization)
+        ));
 
         var accessToken = tokenService.generateAccessToken(
                 user.getId().toString(),
