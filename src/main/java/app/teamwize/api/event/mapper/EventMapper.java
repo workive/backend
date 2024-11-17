@@ -15,7 +15,4 @@ public interface EventMapper {
     EventEntity toEventEntity(Event event);
 
     EventExecution toEventExecution(EventExecutionEntity entity);
-
-
-
 }
