@@ -1,12 +1,9 @@
-package app.teamwize.api.event.rest.response;
-
-import app.teamwize.api.event.model.EventStatus;
-import app.teamwize.api.event.model.EventType;
+package app.teamwize.api.event.model;
 
 import java.time.Instant;
 import java.util.Map;
 
-public record EventResponse(
+public record Event(
         Long id,
         EventType type,
         Map<String, Object> params,

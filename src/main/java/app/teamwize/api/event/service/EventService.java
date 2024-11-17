@@ -1,24 +1,24 @@
 package app.teamwize.api.event.service;
 
-import app.teamwize.api.event.entity.Event;
-import app.teamwize.api.event.entity.EventExecution;
-import app.teamwize.api.event.model.EventExecutionStatus;
-import app.teamwize.api.event.model.EventExitCode;
-import app.teamwize.api.event.model.EventStatus;
-import app.teamwize.api.event.model.EventType;
+import app.teamwize.api.base.domain.model.Paged;
+import app.teamwize.api.base.domain.model.Pagination;
+import app.teamwize.api.event.entity.EventEntity;
+import app.teamwize.api.event.entity.EventExecutionEntity;
+import app.teamwize.api.event.exception.EventNotFoundException;
+import app.teamwize.api.event.mapper.EventMapper;
+import app.teamwize.api.event.model.*;
 import app.teamwize.api.event.repository.EventExecutionRepository;
 import app.teamwize.api.event.repository.EventRepository;
 import app.teamwize.api.event.service.handler.EventHandler;
 import app.teamwize.api.organization.domain.entity.Organization;
-import app.teamwize.api.organization.exception.OrganizationNotFoundException;
-import app.teamwize.api.organization.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -29,14 +29,15 @@ public class EventService {
     private final EventRepository eventRepository;
     private final EventExecutionRepository executionRepository;
     private final List<EventHandler> eventHandlers;
+    private final EventMapper eventMapper;
 
 
     @Transactional
-    public Event emmit(Long organizationId, EventType eventType, Map<String, Object> params, byte maxAttempts, LocalDateTime scheduledAt) {
-        var executions = eventHandlers.stream().filter(eventHandler -> eventHandler.accepts(eventType)).map(eventHandler -> new EventExecution()
+    public Event emmit(Long organizationId, EventType eventType, Map<String, Object> params, byte maxAttempts, Instant scheduledAt) {
+        var executions = eventHandlers.stream().filter(eventHandler -> eventHandler.accepts(eventType)).map(eventHandler -> new EventExecutionEntity()
                 .setStatus(EventExecutionStatus.PENDING)
                 .setHandler(eventHandler.name())).toList();
-        var event = new Event()
+        var event = new EventEntity()
                 .setOrganization(new Organization(organizationId))
                 .setType(eventType)
                 .setParams(params)
@@ -44,12 +45,12 @@ public class EventService {
                 .setMaxAttempts(maxAttempts)
                 .setScheduledAt(scheduledAt)
                 .setExecutions(executions);
-        return eventRepository.persist(event);
+        return eventMapper.toEvent(eventRepository.persist(event));
     }
 
     @Transactional
     public Event emmit(Long organizationId, EventType eventType, Map<String, Object> params) {
-        return emmit(organizationId, eventType, params, (byte) 3, LocalDateTime.now());
+        return emmit(organizationId, eventType, params, (byte) 3, Instant.now());
     }
 
 
@@ -84,4 +85,33 @@ public class EventService {
         }
     }
 
+    public Paged<Event> getEvents(Pagination pagination) {
+        var sort = Sort.by("id").descending();
+        var pageRequest = PageRequest.of(pagination.pageNumber(), pagination.pageSize(), sort);
+        var pagedEvents = eventRepository.findAll(pageRequest);
+        return new Paged<>(
+                pagedEvents.getContent().stream().map(eventMapper::toEvent).toList(),
+                pagination.pageNumber(),
+                pagination.pageSize(),
+                pagedEvents.getTotalElements()
+        );
+
+    }
+
+    public Event getEvent(Long organizationId, Long id) throws EventNotFoundException {
+        var event = eventRepository.findByOrganizationIdAndId(organizationId, id).orElseThrow(() -> new EventNotFoundException(id));
+        return eventMapper.toEvent(event);
+    }
+
+    public Paged<EventExecution> getEventExecutions(Long eventId, Pagination pagination) {
+        var sort = Sort.by("id").descending();
+        var pageRequest = PageRequest.of(pagination.pageNumber(), pagination.pageSize(), sort);
+        var pagedEvents = executionRepository.findByEventId(eventId, pageRequest);
+        return new Paged<>(
+                pagedEvents.getContent().stream().map(eventMapper::toEventExecution).toList(),
+                pagination.pageNumber(),
+                pagination.pageSize(),
+                pagedEvents.getTotalElements()
+        );
+    }
 }

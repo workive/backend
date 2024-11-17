@@ -1,6 +1,6 @@
 package app.teamwize.api.event.service.handler;
 
-import app.teamwize.api.event.entity.Event;
+import app.teamwize.api.event.entity.EventEntity;
 import app.teamwize.api.event.model.EventExitCode;
 import app.teamwize.api.event.model.EventType;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ public class NotificationEventHandler implements EventHandler {
      */
 
     @Override
-    public EventExecutionResult process(Event event) {
+    public EventExecutionResult process(EventEntity eventEntity) {
         return new EventExecutionResult(EventExitCode.SUCCESS, Map.of("notificationId", 1000L));
     }
 }

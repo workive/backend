@@ -16,4 +16,10 @@ public record PagedResponse<T>(
         Integer totalPages,
         @Nonnull
         Long totalContents) {
+
+        public PagedResponse(List<T> contents, Integer pageNumber, Integer pageSize, Long totalContents) {
+                this(contents, pageNumber, pageSize,
+                        (int) Math.ceil((double) totalContents / pageSize),  // Calculate totalPages
+                        totalContents);
+        }
 }
