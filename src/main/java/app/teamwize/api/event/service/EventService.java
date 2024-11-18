@@ -49,8 +49,8 @@ public class EventService {
     }
 
     @Transactional
-    public Event emmit(Long organizationId, EventType eventType, Map<String, Object> params) {
-        return emmit(organizationId, eventType, params, (byte) 3, Instant.now());
+    public Event emmit(Long organizationId, EventPayload eventPayload) {
+        return emmit(organizationId, eventPayload.name(), eventPayload.payload(), (byte) 3, Instant.now());
     }
 
 

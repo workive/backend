@@ -1,7 +1,7 @@
 package app.teamwize.api.leave.service;
 
+import app.teamwize.api.auth.domain.event.UserEventPayload;
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
-import app.teamwize.api.event.model.EventType;
 import app.teamwize.api.event.service.EventService;
 import app.teamwize.api.holiday.domain.entity.Holiday;
 import app.teamwize.api.holiday.service.HolidayService;
@@ -9,6 +9,9 @@ import app.teamwize.api.leave.model.LeaveStatus;
 import app.teamwize.api.leave.model.command.LeaveCreateCommand;
 import app.teamwize.api.leave.model.command.LeaveUpdateCommand;
 import app.teamwize.api.leave.model.entity.Leave;
+import app.teamwize.api.leave.model.event.LeaveCreatedEvent;
+import app.teamwize.api.leave.model.event.LeaveEventPayload;
+import app.teamwize.api.leave.model.event.LeaveStatusUpdatedEvent;
 import app.teamwize.api.leave.rest.mapper.LeaveMapper;
 import app.teamwize.api.leave.rest.model.request.LeaveFilterRequest;
 import app.teamwize.api.leave.exception.LeaveNotFoundException;
@@ -50,10 +53,6 @@ public class LeaveService {
     private final OrganizationService organizationService;
     private final LeavePolicyService leavePolicyService;
     private final EventService eventService;
-    private final LeaveMapper leaveMapper;
-    private final UserMapper userMapper;
-    private final OrganizationMapper organizationMapper;
-    private final ObjectMapper objectMapper;
 
     @Transactional
     public Leave createLeave(Long organizationId, Long userId, LeaveCreateCommand command) throws UserNotFoundException, LeaveTypeNotFoundException, OrganizationNotFoundException {
@@ -77,15 +76,8 @@ public class LeaveService {
                 .setDuration(calculateLeaveDuration(organization, user, command.start(), command.end()));
         dayOff = leaveRepository.persist(dayOff);
 
-        var map = new HashMap<String,Object>();
-        map.put("user",userMapper.toUserResponse(user));
-        map.put("leave",leaveMapper.toDayOffResponse(dayOff));
 
-        eventService.emmit(
-                organizationId,
-                EventType.LEAVE_CREATED,
-                map
-        );
+        eventService.emmit(organizationId, new LeaveCreatedEvent(new LeaveEventPayload(dayOff), new UserEventPayload(user)));
 
         return dayOff;
     }
@@ -117,17 +109,14 @@ public class LeaveService {
 
 
     @Transactional
-    public Leave updateLeave(Long organizationId, Long userId, Long id, LeaveUpdateCommand request) throws LeaveNotFoundException, LeaveUpdateStatusFailedException {
+    public Leave updateLeave(Long organizationId, Long userId, Long id, LeaveUpdateCommand request) throws LeaveNotFoundException, LeaveUpdateStatusFailedException, UserNotFoundException {
+        var user = userService.getUser(organizationId, userId);
         var leave = getById(userId, id);
         if (leave.getStatus() != LeaveStatus.PENDING) {
             throw new LeaveUpdateStatusFailedException(id, leave.getStatus());
         }
         leave.setStatus(request.status());
-        eventService.emmit(
-                organizationId,
-                EventType.LEAVE_STATUS_UPDATED,
-                Map.of("leave", leave)
-        );
+        eventService.emmit(organizationId, new LeaveStatusUpdatedEvent(new LeaveEventPayload(leave), new UserEventPayload(user)));
         return leaveRepository.update(leave);
     }
 

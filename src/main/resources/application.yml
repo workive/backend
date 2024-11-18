@@ -54,7 +54,7 @@ spring:
   docker:
     compose:
       lifecycle-management: start_only
-      enabled: true
+      enabled: false
       start:
         command: up
   servlet:
