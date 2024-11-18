@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="20241110-0958-create-scheduled-jobs-table" author="Mohsen.K">
+        <!-- Creating the scheduled_jobs table -->
+        <createTable tableName="scheduled_jobs">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="cron_expression" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="runner" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="last_executed_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="next_execution_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+
+            <column name="metadata" type="JSONB">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <!-- Adding sequence for the id field -->
+        <createSequence sequenceName="scheduled_job_id_seq" startValue="1" incrementBy="1"/>
+    </changeSet>
+</databaseChangeLog>

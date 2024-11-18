@@ -15,9 +15,6 @@ import java.time.LocalDateTime;
 @Setter
 @MappedSuperclass
 @EntityListeners({AuditingEntityListener.class})
-//@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-//@TypeDef(name = "list-array", typeClass = ListArrayType.class)
-//@TypeDef(typeClass = PostgreSQLIntervalType.class, defaultForType = Duration.class)
 public class BaseAuditEntity {
     @CreatedDate
     @Column(name = "created_at", updatable = false)

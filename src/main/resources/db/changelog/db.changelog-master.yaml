@@ -44,6 +44,3 @@ databaseChangeLog:
   - include:
       file: 20241005-1300-create-leave-policy-activated-table.xml
       relativeToChangelogFile: true
-  - include:
-      file: 20241026-1300-create-spring-batch-tables.xml
-      relativeToChangelogFile: true

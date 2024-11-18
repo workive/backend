@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="20241027-1130-create-event-table" author="M.Karimi">
+        <!-- Creating the events table -->
+        <createTable tableName="events">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="params" type="JSONB">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="exit_code" type="VARCHAR(50)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="max_attempts" type="SMALLINT">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+
+            <column name="scheduled_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="organization_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <!-- Adding sequence for the id field -->
+        <createSequence sequenceName="event_id_seq" startValue="1" incrementBy="10"/>
+
+        <!-- Adding foreign key constraint to organization_id referencing organizations table -->
+
+        <addForeignKeyConstraint
+                baseTableName="events"
+                baseColumnNames="organization_id"
+                referencedTableName="organizations"
+                referencedColumnNames="id"
+                constraintName="fk_events_organization_id"/>
+
+
+        <!-- Adding indices for frequently queried fields -->
+        <createIndex indexName="idx_events_type" tableName="events">
+            <column name="type"/>
+        </createIndex>
+
+        <createIndex indexName="idx_events_status" tableName="events">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex indexName="idx_events_exit_code" tableName="events">
+            <column name="exit_code"/>
+        </createIndex>
+
+        <createIndex indexName="idx_events_scheduled_at" tableName="events">
+            <column name="scheduled_at"/>
+        </createIndex>
+
+        <createIndex indexName="idx_events_organization_id" tableName="events">
+            <column name="organization_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20241027-1130-add-metadata-to-events-table" author="M.Karimi">
+        <addColumn tableName="events">
+            <column name="metadata" type="JSONB"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20241029-2022-create-event-executions-table" author="M.Karimi">
+        <!-- Creating the event_executions table -->
+        <createTable tableName="event_executions">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="event_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="attempts" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="handler" type="VARCHAR(50)" />
+
+            <column name="exit_code" type="VARCHAR(50)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="metadata" type="JSONB">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <!-- Adding sequence for the id field -->
+        <createSequence sequenceName="event_execution_id_seq" startValue="1" incrementBy="10"/>
+
+        <!-- Adding foreign key constraint to event_id referencing events table -->
+        <addForeignKeyConstraint
+                baseTableName="event_executions"
+                baseColumnNames="event_id"
+                referencedTableName="events"
+                referencedColumnNames="id"
+                constraintName="fk_event_executions_event_id"/>
+    </changeSet>
+</databaseChangeLog>

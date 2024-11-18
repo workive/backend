@@ -1,27 +1,33 @@
 package app.teamwize.api.leave.service;
 
+import app.teamwize.api.auth.domain.event.UserEventPayload;
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
+import app.teamwize.api.event.service.EventService;
 import app.teamwize.api.holiday.domain.entity.Holiday;
 import app.teamwize.api.holiday.service.HolidayService;
 import app.teamwize.api.leave.model.LeaveStatus;
 import app.teamwize.api.leave.model.command.LeaveCreateCommand;
 import app.teamwize.api.leave.model.command.LeaveUpdateCommand;
 import app.teamwize.api.leave.model.entity.Leave;
+import app.teamwize.api.leave.model.event.LeaveCreatedEvent;
+import app.teamwize.api.leave.model.event.LeaveEventPayload;
+import app.teamwize.api.leave.model.event.LeaveStatusUpdatedEvent;
+import app.teamwize.api.leave.rest.mapper.LeaveMapper;
 import app.teamwize.api.leave.rest.model.request.LeaveFilterRequest;
 import app.teamwize.api.leave.exception.LeaveNotFoundException;
 import app.teamwize.api.leave.exception.LeaveUpdateStatusFailedException;
 import app.teamwize.api.leave.repository.LeaveRepository;
 import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.leave.model.UserLeaveBalance;
-import app.teamwize.api.notification.model.Email;
-import app.teamwize.api.notification.service.EmailService;
 import app.teamwize.api.organization.domain.entity.Organization;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
+import app.teamwize.api.organization.mapper.OrganizationMapper;
 import app.teamwize.api.organization.service.OrganizationService;
 import app.teamwize.api.user.domain.entity.User;
 import app.teamwize.api.user.exception.UserNotFoundException;
+import app.teamwize.api.user.mapper.UserMapper;
 import app.teamwize.api.user.service.UserService;
-import jakarta.mail.MessagingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,10 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static app.teamwize.api.leave.repository.LeaveSpecifications.*;
@@ -49,7 +52,7 @@ public class LeaveService {
     private final HolidayService holidayService;
     private final OrganizationService organizationService;
     private final LeavePolicyService leavePolicyService;
-    private final EmailService emailService;
+    private final EventService eventService;
 
     @Transactional
     public Leave createLeave(Long organizationId, Long userId, LeaveCreateCommand command) throws UserNotFoundException, LeaveTypeNotFoundException, OrganizationNotFoundException {
@@ -71,7 +74,12 @@ public class LeaveService {
                 .setStatus(LeaveStatus.PENDING)
                 .setType(leaveType)
                 .setDuration(calculateLeaveDuration(organization, user, command.start(), command.end()));
-        return leaveRepository.persist(dayOff);
+        dayOff = leaveRepository.persist(dayOff);
+
+
+        eventService.emmit(organizationId, new LeaveCreatedEvent(new LeaveEventPayload(dayOff), new UserEventPayload(user)));
+
+        return dayOff;
     }
 
     public Page<Leave> getLeaves(Long organizationId, LeaveFilterRequest filters, PaginationRequest pagination) {
@@ -101,15 +109,15 @@ public class LeaveService {
 
 
     @Transactional
-    public Leave updateLeave(Long userId, Long id, LeaveUpdateCommand request) throws LeaveNotFoundException, LeaveUpdateStatusFailedException, MessagingException, UserNotFoundException {
-        var dayOff = getById(userId, id);
-        var user = userService.getUser(dayOff.getOrganization().getId(), userId);
-        if (dayOff.getStatus() != LeaveStatus.PENDING) {
-            throw new LeaveUpdateStatusFailedException(id, dayOff.getStatus());
+    public Leave updateLeave(Long organizationId, Long userId, Long id, LeaveUpdateCommand request) throws LeaveNotFoundException, LeaveUpdateStatusFailedException, UserNotFoundException {
+        var user = userService.getUser(organizationId, userId);
+        var leave = getById(userId, id);
+        if (leave.getStatus() != LeaveStatus.PENDING) {
+            throw new LeaveUpdateStatusFailedException(id, leave.getStatus());
         }
-        dayOff.setStatus(request.status());
-        emailService.sendEmail(new Email(user.getEmail(), "Your leave status changed :" + request.status().toString(), "layout"));
-        return leaveRepository.update(dayOff);
+        leave.setStatus(request.status());
+        eventService.emmit(organizationId, new LeaveStatusUpdatedEvent(new LeaveEventPayload(leave), new UserEventPayload(user)));
+        return leaveRepository.update(leave);
     }
 
     public Leave getLeave(Long userId, Long id) throws LeaveNotFoundException {

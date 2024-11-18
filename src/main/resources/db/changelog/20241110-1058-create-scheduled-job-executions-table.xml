@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="20241110-1058-create-scheduled-job-executions-table" author="Mohsen.K">
+        <!-- Creating the scheduled_job_executions table -->
+        <createTable tableName="scheduled_job_executions">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="scheduled_job_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="executed_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="metadata" type="JSONB">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="error_message" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+        </createTable>
+
+        <createSequence sequenceName="scheduled_job_execution_id_seq" startValue="1" incrementBy="1"/>
+
+
+        <!-- Adding foreign key constraint to scheduled_job_id referencing scheduled_jobs table -->
+        <addForeignKeyConstraint
+                baseTableName="scheduled_job_executions"
+                baseColumnNames="scheduled_job_id"
+                referencedTableName="scheduled_jobs"
+                referencedColumnNames="id"
+                constraintName="fk_scheduled_job_executions_scheduled_job_id"/>
+    </changeSet>
+</databaseChangeLog>

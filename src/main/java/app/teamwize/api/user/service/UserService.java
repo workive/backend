@@ -2,11 +2,15 @@ package app.teamwize.api.user.service;
 
 import app.teamwize.api.assets.domain.exception.AssetNotFoundException;
 import app.teamwize.api.assets.service.AssetService;
+import app.teamwize.api.auth.domain.event.OrganizationEventPayload;
+import app.teamwize.api.auth.domain.event.UserEventPayload;
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
+import app.teamwize.api.event.service.EventService;
 import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.leave.service.LeavePolicyService;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.organization.service.OrganizationService;
+import app.teamwize.api.user.domain.event.UserInvitedEvent;
 import app.teamwize.api.user.exception.*;
 import app.teamwize.api.auth.model.AuthUserDetails;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
@@ -43,6 +47,7 @@ public class UserService {
     private final TeamService teamService;
     private final AssetService assetService;
     private final LeavePolicyService leavePolicyService;
+    private final EventService eventService;
 
     public void checkIfUserExists(String email) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(email)) {
@@ -117,7 +122,9 @@ public class UserService {
         if (request.password() != null && !request.password().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.password()));
         }
-        return userRepository.persist(user);
+        user = userRepository.persist(user);
+        eventService.emmit(organizationId, new UserInvitedEvent(new UserEventPayload(user), new OrganizationEventPayload(organization)));
+        return user;
     }
 
     @Transactional

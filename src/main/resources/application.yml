@@ -57,7 +57,6 @@ spring:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
     show-sql: true
     open-in-view: false
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
   profiles:
     active: dev
   datasource:
@@ -69,12 +68,15 @@ spring:
   docker:
     compose:
       lifecycle-management: start_only
-      enabled: true
+      enabled: false
       start:
         command: up
   servlet:
     multipart:
       max-file-size: "100MB"
+  liquibase:
+    change-log: classpath:/db/db.changelog-master.yaml
+management:
   endpoints:
     web:
       exposure:
@@ -94,10 +96,6 @@ spring:
       enabled: true
     info:
       enabled: true
-  batch:
-    jdbc:
-      isolation-level-for-create: serializable
-      platform: postgresql
 
 springdoc:
   swagger-ui:
@@ -107,4 +105,7 @@ springdoc:
   api-docs:
     enabled: true
     path: /swagger-ui/openapi.json
+
+
+
 

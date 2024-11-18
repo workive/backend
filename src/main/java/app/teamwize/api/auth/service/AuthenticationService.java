@@ -1,10 +1,12 @@
 package app.teamwize.api.auth.service;
 
 
-import app.teamwize.api.auth.rest.model.request.LoginRequest;
+import app.teamwize.api.auth.domain.request.LoginRequest;
 import app.teamwize.api.base.exception.BaseException;
+import app.teamwize.api.event.service.EventService;
 import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.leave.service.LeavePolicyService;
+import app.teamwize.api.organization.mapper.OrganizationMapper;
 import app.teamwize.api.organization.service.OrganizationService;
 import app.teamwize.api.user.domain.request.AdminUserCreateRequest;
 import app.teamwize.api.user.exception.UserAlreadyExistsException;
@@ -15,14 +17,12 @@ import app.teamwize.api.auth.rest.model.request.RegistrationRequest;
 import app.teamwize.api.auth.rest.model.response.AuthenticationResponse;
 import app.teamwize.api.auth.exception.InvalidCredentialException;
 import app.teamwize.api.organization.domain.event.OrganizationCreateRequest;
-import app.teamwize.api.organization.domain.event.OrganizationCreatedEvent;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
 import app.teamwize.api.team.domain.request.TeamCreateRequest;
 import app.teamwize.api.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -39,10 +39,10 @@ public class AuthenticationService implements UserDetailsService {
     private final OrganizationService organizationService;
     private final TokenService tokenService;
     private final UserService userService;
-    private final ApplicationEventPublisher eventPublisher;
     private final UserMapper userMapper;
     private final TeamService teamService;
     private final LeavePolicyService leavePolicyService;
+    private final EventService eventService;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -63,7 +63,11 @@ public class AuthenticationService implements UserDetailsService {
         );
 
         var user = userService.createOrganizationAdmin(organization.getId(), team.getId(), registerRequest);
-        eventPublisher.publishEvent(new OrganizationCreatedEvent(organization, userMapper.toUserResponse(user)));
+
+        eventService.emmit(organization.getId(), new OrganizationCreatedEvent(
+                new UserEventPayload(user),
+                new OrganizationEventPayload(organization)
+        ));
 
 
         var accessToken = tokenService.generateAccessToken(
@@ -105,14 +109,5 @@ public class AuthenticationService implements UserDetailsService {
             throw new UsernameNotFoundException(userId);
         }
     }
-
-//    public ApiKeyValidateResponse validateApiKey(ApiKeyValidateRequest request) throws ApiKeyNotFoundException {
-//        var apiKey = apiKeyService.findByKey(request.getApiKey());
-//        var site = siteService.getOrganizationDefaultSite(apiKey.getOrganizationId());
-//
-//        return new ApiKeyValidateResponse()
-//                .setOrganizationId(apiKey.getOrganizationId())
-//                .setSiteId(site.getId());
-//    }
 
 }
