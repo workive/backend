@@ -1,14 +1,24 @@
 package app.teamwize.api.user.domain.event;
 
-import app.teamwize.api.user.domain.UserRole;
-import lombok.Data;
+import app.teamwize.api.auth.domain.event.OrganizationEventPayload;
+import app.teamwize.api.auth.domain.event.UserEventPayload;
+import app.teamwize.api.event.model.EventPayload;
+import app.teamwize.api.event.model.EventType;
 
-@Data
-public class UserInvitedEvent {
-    private Long userId;
-    private Long organizationId;
-    private Long siteId;
-    private UserRole role;
-    private String email;
-    private String language;
+import java.util.Map;
+
+
+public record UserInvitedEvent(UserEventPayload user, OrganizationEventPayload organization) implements EventPayload {
+    @Override
+    public EventType name() {
+        return EventType.USER_CREATED;
+    }
+
+    @Override
+    public Map<String, Object> payload() {
+        return Map.of(
+                "user", user,
+                "organization", organization
+        );
+    }
 }

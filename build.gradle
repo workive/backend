@@ -9,7 +9,7 @@ group = 'app.teamwize'
 version = '0.9.0'
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_17
+	sourceCompatibility = JavaVersion.VERSION_21
 }
 
 configurations {
