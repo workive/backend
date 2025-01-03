@@ -77,7 +77,7 @@ public class LeaveService {
         dayOff = leaveRepository.persist(dayOff);
 
 
-        eventService.emmit(organizationId, new LeaveCreatedEvent(new LeaveEventPayload(dayOff), new UserEventPayload(user)));
+       // eventService.emmit(organizationId, new LeaveCreatedEvent(new LeaveEventPayload(dayOff), new UserEventPayload(user)));
 
         return dayOff;
     }
