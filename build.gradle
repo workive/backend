@@ -48,10 +48,6 @@ dependencies {
 	implementation 'com.auth0:java-jwt:4.3.0'
 
 
-//	implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.12.770'
-
-
-
 	compileOnly 'com.google.code.findbugs:jsr305:3.0.1'
 	compileOnly 'com.google.code.findbugs:annotations:3.0.1'
 
@@ -68,7 +64,7 @@ dependencies {
 
 jib {
 	from {
-		image = 'openjdk:17-alpine'
+		image = 'mcr.microsoft.com/openjdk/jdk:21-distroless'
 	}
 	to {
 		image = 'ghcr.io/teamwize/api:dev'
