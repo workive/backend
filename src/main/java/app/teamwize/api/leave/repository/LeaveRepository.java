@@ -24,7 +24,7 @@ public interface LeaveRepository extends BaseJpaRepository<Leave, Long>, JpaSpec
     Page<Leave> findByOrganizationIdAndUserId(Long organizationId, Long userId, Pageable page);
 
 
-    @EntityGraph(attributePaths = {"user", "user.team", "user.avatar", "type"}, type = EntityGraph.EntityGraphType.FETCH)
+    @EntityGraph(attributePaths = {"user", "user.team", "user.avatar", "type","type.type"}, type = EntityGraph.EntityGraphType.FETCH)
     Page<Leave> findAll(Specification<Leave> spec, Pageable pageable);
 
     @Query("select sum(l.duration) from Leave l where l.organization.id=:organizationId and l.user.id=:userId and l.type.id=:typeId and l.status=:status")
