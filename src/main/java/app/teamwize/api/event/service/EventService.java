@@ -40,7 +40,7 @@ public class EventService {
         var event = new EventEntity()
                 .setOrganization(new Organization(organizationId))
                 .setType(eventType)
-                .setParams(params)
+                .setParams(Map.of())
                 .setStatus(EventStatus.PENDING)
                 .setMaxAttempts(maxAttempts)
                 .setScheduledAt(scheduledAt)
