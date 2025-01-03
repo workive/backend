@@ -13,7 +13,7 @@ public record LeaveResponse(
         LocalDateTime endAt,
         LeaveStatus status,
         Float duration,
-        LeaveTypeResponse type,
+        LeavePolicyActivatedTypeResponse type,
         String reason,
         UserCompactResponse user) {
 }
