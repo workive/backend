@@ -24,10 +24,13 @@ public class StorageConfig {
     @Value("${app.storage.s3.secret-key}")
     private String s3SecretKey;
 
+    @Value("${app.storage.s3.region}")
+    private String s3Region;
+
     @Bean
     public S3Client s3Client() throws URISyntaxException {
         return S3Client.builder()
-                .region(Region.EU_CENTRAL_1)
+                .region(Region.of(s3Region))
                 .forcePathStyle(true)
                 .endpointOverride(new URI(s3EndpointUrl))
                 .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(s3AccessKey, s3SecretKey)))
