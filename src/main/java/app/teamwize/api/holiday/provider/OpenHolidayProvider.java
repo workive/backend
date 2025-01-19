@@ -32,12 +32,14 @@ public class OpenHolidayProvider implements PublicHolidayProvider {
 
     @Override
     public List<FetchedPublicHoliday> getPublicHolidays(String country, Integer year) {
+        var startDate = LocalDate.of(year, 1, 1);
+        var endDate = startDate.plusYears(1).minusDays(1);
         List<OpenHolidayResponse> publicHolidays = this.restClient.get().uri(uriBuilder -> uriBuilder
                         .path("/PublicHolidays")
                         .queryParam("countryIsoCode", country)
                         .queryParam("languageIsoCode", "EN")
-                        .queryParam("validFrom", LocalDate.of(year, 1, 1).toString())
-                        .queryParam("validTo", LocalDate.of(year + 1, 1, 1).toString())
+                        .queryParam("validFrom", startDate.toString())
+                        .queryParam("validTo", endDate.toString())
                         .build())
 
                 .accept(APPLICATION_JSON).retrieve()
