@@ -1,9 +1,11 @@
 package app.teamwize.api.leave.rest.controller;
 
 import app.teamwize.api.auth.service.SecurityService;
+import app.teamwize.api.leave.exception.LeavePolicyNotFoundException;
 import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.leave.rest.mapper.LeavePolicyMapper;
 import app.teamwize.api.leave.rest.model.request.LeavePolicyCreateRequest;
+import app.teamwize.api.leave.rest.model.request.LeavePolicyUpdateRequest;
 import app.teamwize.api.leave.rest.model.response.LeavePolicyResponse;
 import app.teamwize.api.leave.service.LeavePolicyService;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
@@ -19,7 +21,7 @@ import java.util.List;
 public class LeavePolicyController {
 
     private final LeavePolicyService leavePolicyService;
-    private final LeavePolicyMapper LeavePolicyMapper;
+    private final LeavePolicyMapper leavePolicyMapper;
     private final SecurityService securityService;
 
     @PostMapping
@@ -27,17 +29,16 @@ public class LeavePolicyController {
             throws OrganizationNotFoundException, LeaveTypeNotFoundException {
         var leaveType = leavePolicyService.createLeavePolicy(
                 securityService.getUserOrganizationId(),
-                false,
-                LeavePolicyMapper.toNewLeavePolicy(request)
+                leavePolicyMapper.toNewLeavePolicy(request)
         );
-        return LeavePolicyMapper.toResponse(leaveType);
+        return leavePolicyMapper.toResponse(leaveType);
     }
 
     @GetMapping
     public List<LeavePolicyResponse> getLeavePolicies() {
         var leaveTypes = leavePolicyService.getLeavePolicies(securityService.getUserOrganizationId());
         return leaveTypes.stream()
-                .map(LeavePolicyMapper::toResponse)
+                .map(leavePolicyMapper::toResponse)
                 .toList();
     }
 
@@ -53,6 +54,17 @@ public class LeavePolicyController {
     @PostMapping("{id}/default")
     public void updateDefaultPolicy(@PathVariable Long id) {
         leavePolicyService.updateDefaultPolicy(securityService.getUserOrganizationId(), id);
+    }
+
+    @PutMapping("{id}")
+    public LeavePolicyResponse updateLeavePolicy(@PathVariable Long id, @RequestBody LeavePolicyUpdateRequest request)
+            throws OrganizationNotFoundException, LeaveTypeNotFoundException, LeavePolicyNotFoundException {
+        var leaveType = leavePolicyService.updateLeavePolicy(
+                securityService.getUserOrganizationId(),
+                id,
+                leavePolicyMapper.toUpdateLeavePolicy(request)
+        );
+        return leavePolicyMapper.toResponse(leaveType);
     }
 
 

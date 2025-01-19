@@ -1,6 +1,7 @@
 package app.teamwize.api.leave.service;
 
 import app.teamwize.api.base.domain.entity.EntityStatus;
+import app.teamwize.api.leave.exception.LeavePolicyNotFoundException;
 import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.leave.model.LeavePolicyStatus;
 import app.teamwize.api.leave.model.LeaveTypeCycle;
@@ -29,12 +30,12 @@ public class LeavePolicyService {
     private final LeaveTypeService leaveTypeService;
 
     @Transactional
-    public LeavePolicy createLeavePolicy(Long organizationId, Boolean isDefault, LeavePolicyCommand leavePolicyCommand) throws OrganizationNotFoundException, LeaveTypeNotFoundException {
+    public LeavePolicy createLeavePolicy(Long organizationId, LeavePolicyCommand leavePolicyCommand) throws OrganizationNotFoundException, LeaveTypeNotFoundException {
         var organization = organizationService.getOrganization(organizationId);
 
         var policy = new LeavePolicy()
                 .setName(leavePolicyCommand.name())
-                .setStatus(isDefault ? LeavePolicyStatus.DEFAULT : LeavePolicyStatus.ACTIVE)
+                .setStatus(leavePolicyCommand.status())
                 .setOrganization(organization)
                 .setActivatedTypes(new ArrayList<>());
 
@@ -60,23 +61,24 @@ public class LeavePolicyService {
                 new LeaveTypeCommand("Sick-Leave", LeaveTypeCycle.PER_YEAR)
         ));
         var request = new LeavePolicyCommand("Default-Policy",
+                LeavePolicyStatus.DEFAULT,
                 List.of(
                         new LeavePolicyActivatedTypeCommand(leaveTypes.get(0).getId(), 2, true),
                         new LeavePolicyActivatedTypeCommand(leaveTypes.get(1).getId(), 2, true),
                         new LeavePolicyActivatedTypeCommand(leaveTypes.get(2).getId(), 30, false)
                 )
         );
-        return createLeavePolicy(organizationId, true, request);
+        return createLeavePolicy(organizationId, request);
     }
 
     public List<LeavePolicy> getLeavePolicies(Long organizationId) {
-        return leavePolicyRepository.findByOrganizationIdAndStatusIsIn(organizationId, List.of(LeavePolicyStatus.ACTIVE));
+        return leavePolicyRepository.findByOrganizationIdAndStatusIsIn(organizationId, List.of(LeavePolicyStatus.ACTIVE, LeavePolicyStatus.DEFAULT));
     }
 
     public Optional<LeavePolicy> getDefaultLeavePolicy(Long organizationId) {
         var policies = leavePolicyRepository.findByOrganizationIdAndStatusIsIn(organizationId, List.of(LeavePolicyStatus.DEFAULT));
         if (policies.isEmpty()) return Optional.empty();
-        return Optional.of(policies.get(0));
+        return Optional.of(policies.getFirst());
     }
 
     @Transactional
@@ -91,12 +93,36 @@ public class LeavePolicyService {
     }
 
     @Transactional
+    public LeavePolicy updateLeavePolicy(Long organizationId, Long id, LeavePolicyCommand command) throws OrganizationNotFoundException, LeavePolicyNotFoundException, LeaveTypeNotFoundException {
+        var organization = organizationService.getOrganization(organizationId);
+        var policy = getLeavePolicy(organizationId, id)
+                .setName(command.name())
+                .setStatus(command.status())
+                .setOrganization(organization);
+
+        policy.getActivatedTypes().clear();
+
+        for (var activatedType : command.activatedTypes()) {
+            var type = leaveTypeService.getLeaveType(organizationId, activatedType.typeId());
+            policy.getActivatedTypes().add(new LeavePolicyActivatedType()
+                    .setType(type)
+                    .setPolicy(policy)
+                    .setAmount(activatedType.amount())
+                    .setRequiresApproval(activatedType.requiresApproval())
+                    .setStatus(EntityStatus.ACTIVE)
+            );
+        }
+
+        return leavePolicyRepository.merge(policy);
+    }
+
+    @Transactional
     public void deleteLeavePolicy(Long organizationId, Long id) {
         leavePolicyRepository.updateStatus(organizationId, id, LeavePolicyStatus.ARCHIVED);
     }
 
-    public LeavePolicy getLeavePolicy(Long organizationId, Long id) throws LeaveTypeNotFoundException {
+    public LeavePolicy getLeavePolicy(Long organizationId, Long id) throws LeavePolicyNotFoundException {
         return leavePolicyRepository.findByOrganizationIdAndId(organizationId, id)
-                .orElseThrow(() -> new LeaveTypeNotFoundException(id));
+                .orElseThrow(() -> new LeavePolicyNotFoundException(id));
     }
 }

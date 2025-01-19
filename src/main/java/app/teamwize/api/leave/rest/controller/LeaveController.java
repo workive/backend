@@ -2,6 +2,7 @@ package app.teamwize.api.leave.rest.controller;
 
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
 import app.teamwize.api.base.domain.model.response.PagedResponse;
+import app.teamwize.api.leave.exception.LeavePolicyNotFoundException;
 import app.teamwize.api.leave.rest.mapper.LeaveMapper;
 import app.teamwize.api.auth.service.SecurityService;
 import app.teamwize.api.base.mapper.PagedResponseMapper;
@@ -36,7 +37,7 @@ public class LeaveController {
 
     @PostMapping
     public LeaveResponse create(@RequestBody LeaveCreateRequest request)
-            throws UserNotFoundException, LeaveTypeNotFoundException, OrganizationNotFoundException {
+            throws UserNotFoundException, LeaveTypeNotFoundException, OrganizationNotFoundException, LeavePolicyNotFoundException {
         var dayOff = leaveService.createLeave(
                 securityService.getUserOrganizationId(),
                 securityService.getUserId(),
@@ -71,14 +72,14 @@ public class LeaveController {
     }
 
     @GetMapping("mine/balance")
-    public List<UserLeaveBalanceResponse> getBalance() throws UserNotFoundException, LeaveTypeNotFoundException {
+    public List<UserLeaveBalanceResponse> getBalance() throws UserNotFoundException, LeavePolicyNotFoundException {
         return leaveService.getLeaveBalance(securityService.getUserOrganizationId(), securityService.getUserId())
                 .stream().map(leaveMapper::toResponse)
                 .toList();
     }
 
     @GetMapping("{id}/balance")
-    public List<UserLeaveBalanceResponse> getBalanceById(@PathVariable Long id) throws UserNotFoundException, LeaveTypeNotFoundException {
+    public List<UserLeaveBalanceResponse> getBalanceById(@PathVariable Long id) throws UserNotFoundException,  LeavePolicyNotFoundException {
         return leaveService.getLeaveBalance(securityService.getUserOrganizationId(), id)
                 .stream().map(leaveMapper::toResponse)
                 .toList();
