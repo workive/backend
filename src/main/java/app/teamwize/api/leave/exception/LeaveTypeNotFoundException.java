@@ -1,9 +1,9 @@
 package app.teamwize.api.leave.exception;
 
-import app.teamwize.api.base.exception.BaseException;
-import lombok.RequiredArgsConstructor;
+import app.teamwize.api.base.exception.NotFoundException;
 
-@RequiredArgsConstructor
-public class LeaveTypeNotFoundException extends BaseException {
-    private final long id;
+public class LeaveTypeNotFoundException extends NotFoundException {
+    public LeaveTypeNotFoundException(String message) {
+        super(message);
+    }
 }

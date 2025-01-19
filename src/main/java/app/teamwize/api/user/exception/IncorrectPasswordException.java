@@ -1,8 +1,11 @@
 package app.teamwize.api.user.exception;
 
 
-import app.teamwize.api.base.exception.BaseException;
+import app.teamwize.api.base.exception.UnprocessableEntityException;
 
-public class IncorrectPasswordException extends BaseException {
+public class IncorrectPasswordException extends UnprocessableEntityException {
+    public IncorrectPasswordException(String message) {
+        super(message);
+    }
 
 }

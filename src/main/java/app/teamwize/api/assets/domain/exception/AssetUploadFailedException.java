@@ -1,9 +1,10 @@
 package app.teamwize.api.assets.domain.exception;
 
-import app.teamwize.api.base.exception.BaseException;
-import lombok.RequiredArgsConstructor;
+import app.teamwize.api.base.exception.ServerException;
 
 
-@RequiredArgsConstructor
-public class AssetUploadFailedException extends BaseException {
+public class AssetUploadFailedException extends ServerException {
+    public AssetUploadFailedException(String message) {
+        super(message);
+    }
 }

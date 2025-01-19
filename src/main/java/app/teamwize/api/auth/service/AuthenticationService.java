@@ -5,25 +5,25 @@ import app.teamwize.api.auth.domain.event.OrganizationCreatedEvent;
 import app.teamwize.api.auth.domain.event.OrganizationEventPayload;
 import app.teamwize.api.auth.domain.event.UserEventPayload;
 import app.teamwize.api.auth.domain.request.LoginRequest;
+import app.teamwize.api.auth.domain.request.RegistrationRequest;
+import app.teamwize.api.auth.domain.response.AuthenticationResponse;
+import app.teamwize.api.auth.exception.InvalidCredentialException;
 import app.teamwize.api.base.exception.BaseException;
 import app.teamwize.api.event.service.EventService;
 import app.teamwize.api.leave.exception.LeavePolicyNotFoundException;
 import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.leave.service.LeavePolicyService;
+import app.teamwize.api.organization.domain.event.OrganizationCreateRequest;
+import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.organization.service.OrganizationService;
+import app.teamwize.api.team.domain.exception.TeamNotFoundException;
+import app.teamwize.api.team.domain.request.TeamCreateRequest;
+import app.teamwize.api.team.service.TeamService;
 import app.teamwize.api.user.domain.request.AdminUserCreateRequest;
 import app.teamwize.api.user.exception.UserAlreadyExistsException;
 import app.teamwize.api.user.exception.UserNotFoundException;
 import app.teamwize.api.user.mapper.UserMapper;
 import app.teamwize.api.user.service.UserService;
-import app.teamwize.api.auth.domain.request.RegistrationRequest;
-import app.teamwize.api.auth.domain.response.AuthenticationResponse;
-import app.teamwize.api.auth.exception.InvalidCredentialException;
-import app.teamwize.api.organization.domain.event.OrganizationCreateRequest;
-import app.teamwize.api.organization.exception.OrganizationNotFoundException;
-import app.teamwize.api.team.domain.exception.TeamNotFoundException;
-import app.teamwize.api.team.domain.request.TeamCreateRequest;
-import app.teamwize.api.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -96,7 +96,7 @@ public class AuthenticationService implements UserDetailsService {
             return new AuthenticationResponse(accessToken, refreshToken, userMapper.toUserResponse(user));
 
         } catch (UserNotFoundException ex) {
-            throw new InvalidCredentialException(request.getEmail());
+            throw new InvalidCredentialException("Invalid email or password , email: " + request.getEmail());
         }
     }
 

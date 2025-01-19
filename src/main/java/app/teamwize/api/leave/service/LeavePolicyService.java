@@ -5,8 +5,8 @@ import app.teamwize.api.leave.exception.LeavePolicyNotFoundException;
 import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.leave.model.LeavePolicyStatus;
 import app.teamwize.api.leave.model.LeaveTypeCycle;
-import app.teamwize.api.leave.model.command.LeavePolicyCommand;
 import app.teamwize.api.leave.model.command.LeavePolicyActivatedTypeCommand;
+import app.teamwize.api.leave.model.command.LeavePolicyCommand;
 import app.teamwize.api.leave.model.command.LeaveTypeCommand;
 import app.teamwize.api.leave.model.entity.LeavePolicy;
 import app.teamwize.api.leave.model.entity.LeavePolicyActivatedType;
@@ -123,6 +123,6 @@ public class LeavePolicyService {
 
     public LeavePolicy getLeavePolicy(Long organizationId, Long id) throws LeavePolicyNotFoundException {
         return leavePolicyRepository.findByOrganizationIdAndId(organizationId, id)
-                .orElseThrow(() -> new LeavePolicyNotFoundException(id));
+                .orElseThrow(() -> new LeavePolicyNotFoundException("Leave policy not found with id: " + id));
     }
 }

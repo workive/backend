@@ -1,13 +1,13 @@
 package app.teamwize.api.assets.service;
 
 
-import app.teamwize.api.organization.exception.OrganizationNotFoundException;
-import app.teamwize.api.organization.service.OrganizationService;
 import app.teamwize.api.assets.domain.entity.Asset;
 import app.teamwize.api.assets.domain.exception.AssetNotFoundException;
 import app.teamwize.api.assets.domain.exception.AssetUploadFailedException;
 import app.teamwize.api.assets.domain.model.AssetCategory;
 import app.teamwize.api.assets.repository.AssetRepository;
+import app.teamwize.api.organization.exception.OrganizationNotFoundException;
+import app.teamwize.api.organization.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,13 +43,12 @@ public class AssetService {
 
     public Asset getAsset(Long organizationId, Long fileAssetId) throws AssetNotFoundException {
         return assetRepository.findByOrganizationIdAndId(organizationId, fileAssetId)
-                .orElseThrow(() -> new AssetNotFoundException(fileAssetId));
-
+                .orElseThrow(() -> new AssetNotFoundException("Asset not found with Id: " + fileAssetId));
     }
 
     public Asset getAssetByName(Long organizationId, String name) throws AssetNotFoundException {
         return assetRepository.findByOrganizationIdAndName(organizationId, name)
-                .orElseThrow(() -> new AssetNotFoundException(0L));
+                .orElseThrow(() -> new AssetNotFoundException("Asset not found with Name :" + name));
     }
 
     public List<Asset> getAssets(Long organizationId, List<Long> fileAssetIds) {
@@ -92,7 +91,7 @@ public class AssetService {
             return results;
         } catch (IOException ex) {
             log.error("Exception in uploading files to s3", ex);
-            throw new AssetUploadFailedException();
+            throw new AssetUploadFailedException("Failed to upload files");
         }
     }
 

@@ -1,11 +1,11 @@
 package app.teamwize.api.event.exception;
 
-import app.teamwize.api.base.exception.BaseException;
-import lombok.RequiredArgsConstructor;
+import app.teamwize.api.base.exception.NotFoundException;
 
-@RequiredArgsConstructor
-public class EventNotFoundException extends BaseException {
+public class EventNotFoundException extends NotFoundException {
 
-    private final Long id;
 
+    public EventNotFoundException(String message) {
+        super(message);
+    }
 }

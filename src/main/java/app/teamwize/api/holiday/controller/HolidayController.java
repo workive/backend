@@ -1,9 +1,9 @@
 package app.teamwize.api.holiday.controller;
 
 import app.teamwize.api.auth.service.SecurityService;
-import app.teamwize.api.holiday.domain.exception.PublicHolidayProviderConnectionBrokenException;
-import app.teamwize.api.holiday.domain.response.FetchedPublicHoliday;
+import app.teamwize.api.base.exception.ServerException;
 import app.teamwize.api.holiday.domain.request.HolidayCreateRequest;
+import app.teamwize.api.holiday.domain.response.FetchedPublicHoliday;
 import app.teamwize.api.holiday.domain.response.HolidayResponse;
 import app.teamwize.api.holiday.mapper.HolidayMapper;
 import app.teamwize.api.holiday.service.HolidayService;
@@ -29,7 +29,7 @@ public class HolidayController {
     }
 
     @GetMapping("fetch")
-    public List<FetchedPublicHoliday> fetchPublicHoliday(Integer year) throws OrganizationNotFoundException, PublicHolidayProviderConnectionBrokenException {
+    public List<FetchedPublicHoliday> fetchPublicHoliday(Integer year) throws OrganizationNotFoundException, ServerException {
         return holidayService.fetchPublicHolidays(securityService.getUserOrganizationId(), year);
     }
 

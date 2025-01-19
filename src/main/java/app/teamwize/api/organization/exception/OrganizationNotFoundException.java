@@ -1,9 +1,10 @@
 package app.teamwize.api.organization.exception;
 
-import app.teamwize.api.base.exception.BaseException;
-import lombok.RequiredArgsConstructor;
+import app.teamwize.api.base.exception.NotFoundException;
 
-@RequiredArgsConstructor
-public class OrganizationNotFoundException extends BaseException {
-    private final long organizationId;
+public class OrganizationNotFoundException extends NotFoundException {
+
+    public OrganizationNotFoundException(String message) {
+        super(message);
+    }
 }

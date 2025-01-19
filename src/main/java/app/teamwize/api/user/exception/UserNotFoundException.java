@@ -1,26 +1,10 @@
 package app.teamwize.api.user.exception;
 
-import app.teamwize.api.base.exception.BaseException;
-import lombok.NoArgsConstructor;
+import app.teamwize.api.base.exception.NotFoundException;
 
-@NoArgsConstructor
-public class UserNotFoundException extends BaseException {
+public class UserNotFoundException extends NotFoundException {
 
-
-    private long organizationId;
-
-
-    private long userId;
-
-
-    private String email;
-
-    public UserNotFoundException(long organizationId, long userId) {
-        this.organizationId = organizationId;
-        this.userId = userId;
-    }
-
-    public UserNotFoundException(String email) {
-        this.email = email;
+    public UserNotFoundException(String message) {
+        super(message);
     }
 }
