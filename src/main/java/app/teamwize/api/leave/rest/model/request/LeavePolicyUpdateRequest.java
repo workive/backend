@@ -5,7 +5,7 @@ import app.teamwize.api.leave.model.LeavePolicyStatus;
 
 import java.util.List;
 
-public record LeavePolicyCreateRequest(
+public record LeavePolicyUpdateRequest(
         String name,
         LeavePolicyStatus status,
         List<LeavePolicyActivatedTypeRequest> activatedTypes) {

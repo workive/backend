@@ -3,6 +3,7 @@ package app.teamwize.api.auth.controller;
 
 import app.teamwize.api.auth.domain.request.LoginRequest;
 import app.teamwize.api.auth.service.AuthenticationService;
+import app.teamwize.api.leave.exception.LeavePolicyNotFoundException;
 import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
@@ -29,7 +30,7 @@ public class AuthenticationController {
     @PostMapping("register")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthenticationResponse register(@Valid @RequestBody RegistrationRequest request)
-            throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException, LeaveTypeNotFoundException {
+            throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException, LeaveTypeNotFoundException, LeavePolicyNotFoundException {
         return authenticationService.register(request);
     }
 

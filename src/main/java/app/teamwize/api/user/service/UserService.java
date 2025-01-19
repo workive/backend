@@ -6,7 +6,7 @@ import app.teamwize.api.auth.domain.event.OrganizationEventPayload;
 import app.teamwize.api.auth.domain.event.UserEventPayload;
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
 import app.teamwize.api.event.service.EventService;
-import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
+import app.teamwize.api.leave.exception.LeavePolicyNotFoundException;
 import app.teamwize.api.leave.service.LeavePolicyService;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.organization.service.OrganizationService;
@@ -72,7 +72,7 @@ public class UserService {
     }
 
     @Transactional
-    public User createOrganizationAdmin(Long organizationId, Long teamId, AdminUserCreateRequest request) throws UserAlreadyExistsException, TeamNotFoundException, OrganizationNotFoundException, LeaveTypeNotFoundException {
+    public User createOrganizationAdmin(Long organizationId, Long teamId, AdminUserCreateRequest request) throws UserAlreadyExistsException, TeamNotFoundException, OrganizationNotFoundException, LeavePolicyNotFoundException {
         var organization = organizationService.getOrganization(organizationId);
         checkIfUserExists(request.email());
         var team = teamService.getTeam(organizationId, teamId);
@@ -96,7 +96,7 @@ public class UserService {
 
     @Transactional
     public User createUser(Long organizationId, Long inviterUserId, UserCreateRequest request)
-            throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException, UserNotFoundException, PermissionDeniedException, LeaveTypeNotFoundException {
+            throws UserAlreadyExistsException, OrganizationNotFoundException, TeamNotFoundException, UserNotFoundException, PermissionDeniedException, LeavePolicyNotFoundException {
         var organization = organizationService.getOrganization(organizationId);
         var team = teamService.getTeam(organizationId, request.teamId());
         var leavePolicy = leavePolicyService.getLeavePolicy(organizationId, request.leavePolicyId());
