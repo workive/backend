@@ -1,6 +1,7 @@
 package app.teamwize.api.holiday.service;
 
 import app.teamwize.api.base.exception.ServerException;
+import app.teamwize.api.holiday.domain.HolidaysOverview;
 import app.teamwize.api.holiday.domain.entity.Holiday;
 import app.teamwize.api.holiday.domain.request.HolidayCreateRequest;
 import app.teamwize.api.holiday.domain.response.FetchedPublicHoliday;
@@ -38,17 +39,23 @@ public class HolidayService {
     }
 
     @Transactional
-    public List<FetchedPublicHoliday> fetchPublicHolidays(Long organizationId, Integer year) throws OrganizationNotFoundException, ServerException {
+    public List<FetchedPublicHoliday> fetchPublicHolidays(Long organizationId, Integer year, String countryCode) throws OrganizationNotFoundException, ServerException {
         if (year == null) {
             year = LocalDate.now().getYear();
         }
-        var organization = organizationService.getOrganization(organizationId);
+        if (countryCode == null || countryCode.isBlank()) {
+            countryCode = organizationService.getOrganization(organizationId).getCountry();
+        }
         try {
-            return publicHolidayProvider.getPublicHolidays(organization.getCountry(), year);
+            return publicHolidayProvider.getPublicHolidays(countryCode, year);
         } catch (Exception ex) {
             log.error("Failed to fetch public holidays", ex);
             throw new ServerException("Failed to fetch public holidays, please try again later");
         }
+    }
+
+    public List<HolidaysOverview> getOverview(Long organizationId) {
+        return holidayRepository.findByOverview(organizationId);
     }
 
     public List<Holiday> getHolidays(Long organizationId, Integer year, String country) {
