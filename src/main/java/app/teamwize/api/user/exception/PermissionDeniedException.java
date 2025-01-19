@@ -1,12 +1,10 @@
 package app.teamwize.api.user.exception;
 
-import app.teamwize.api.base.exception.BaseException;
-import lombok.NoArgsConstructor;
+import app.teamwize.api.base.exception.UnprocessableEntityException;
 
-public class PermissionDeniedException extends BaseException {
-    private final long organizationId;
-    public PermissionDeniedException(long organizationId) {
-        this.organizationId = organizationId;
+public class PermissionDeniedException extends UnprocessableEntityException {
+
+    public PermissionDeniedException(String message) {
+        super(message);
     }
-
 }

@@ -45,7 +45,7 @@ public class OrganizationService {
 
     private Organization getById(Long organizationId) throws OrganizationNotFoundException {
         return organizationRepository.findById(organizationId)
-                .orElseThrow(() -> new OrganizationNotFoundException(organizationId));
+                .orElseThrow(() -> new OrganizationNotFoundException("Organization not found with Id: " + organizationId));
     }
 
     private Organization buildOrganization(OrganizationCreateRequest request) {

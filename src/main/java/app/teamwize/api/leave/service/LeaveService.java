@@ -5,19 +5,19 @@ import app.teamwize.api.base.domain.model.request.PaginationRequest;
 import app.teamwize.api.event.service.EventService;
 import app.teamwize.api.holiday.domain.entity.Holiday;
 import app.teamwize.api.holiday.service.HolidayService;
+import app.teamwize.api.leave.exception.LeaveNotFoundException;
 import app.teamwize.api.leave.exception.LeavePolicyNotFoundException;
+import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
+import app.teamwize.api.leave.exception.LeaveUpdateStatusFailedException;
 import app.teamwize.api.leave.model.LeaveStatus;
+import app.teamwize.api.leave.model.UserLeaveBalance;
 import app.teamwize.api.leave.model.command.LeaveCreateCommand;
 import app.teamwize.api.leave.model.command.LeaveUpdateCommand;
 import app.teamwize.api.leave.model.entity.Leave;
 import app.teamwize.api.leave.model.event.LeaveEventPayload;
 import app.teamwize.api.leave.model.event.LeaveStatusUpdatedEvent;
-import app.teamwize.api.leave.rest.model.request.LeaveFilterRequest;
-import app.teamwize.api.leave.exception.LeaveNotFoundException;
-import app.teamwize.api.leave.exception.LeaveUpdateStatusFailedException;
 import app.teamwize.api.leave.repository.LeaveRepository;
-import app.teamwize.api.leave.exception.LeaveTypeNotFoundException;
-import app.teamwize.api.leave.model.UserLeaveBalance;
+import app.teamwize.api.leave.rest.model.request.LeaveFilterRequest;
 import app.teamwize.api.organization.domain.entity.Organization;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.organization.service.OrganizationService;
@@ -34,7 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static app.teamwize.api.leave.repository.LeaveSpecifications.*;
@@ -59,7 +61,7 @@ public class LeaveService {
         var leaveType = leavePolicy.getActivatedTypes().stream()
                 .filter(type -> type.getId().equals(command.activatedTypeId()))
                 .findFirst()
-                .orElseThrow(() -> new LeaveTypeNotFoundException(command.activatedTypeId()));
+                .orElseThrow(() -> new LeaveTypeNotFoundException("Leave type not found with id: " + command.activatedTypeId()));
 
         var dayOff = new Leave()
                 .setReason(command.reason())
@@ -109,7 +111,7 @@ public class LeaveService {
         var user = userService.getUser(organizationId, userId);
         var leave = getById(userId, id);
         if (leave.getStatus() != LeaveStatus.PENDING) {
-            throw new LeaveUpdateStatusFailedException(id, leave.getStatus());
+            throw new LeaveUpdateStatusFailedException("Leave update failed because it is not in pending status, id = " + id);
         }
         leave.setStatus(request.status());
         eventService.emmit(organizationId, new LeaveStatusUpdatedEvent(new LeaveEventPayload(leave), new UserEventPayload(user)));
@@ -126,7 +128,7 @@ public class LeaveService {
     }
 
     private Leave getById(Long userId, Long id) throws LeaveNotFoundException {
-        return leaveRepository.findByUserIdAndId(userId, id).orElseThrow(() -> new LeaveNotFoundException(id));
+        return leaveRepository.findByUserIdAndId(userId, id).orElseThrow(() -> new LeaveNotFoundException("Leave not found with id: " + id));
     }
 
     public List<UserLeaveBalance> getLeaveBalance(Long organizationId, Long userId) throws UserNotFoundException,  LeavePolicyNotFoundException {

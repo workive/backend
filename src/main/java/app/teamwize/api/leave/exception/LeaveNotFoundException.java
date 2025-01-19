@@ -1,9 +1,10 @@
 package app.teamwize.api.leave.exception;
 
-import app.teamwize.api.base.exception.BaseException;
-import lombok.RequiredArgsConstructor;
+import app.teamwize.api.base.exception.NotFoundException;
 
-@RequiredArgsConstructor
-public class LeaveNotFoundException extends BaseException {
-    private final long dayOffId;
+public class LeaveNotFoundException extends NotFoundException {
+
+    public LeaveNotFoundException(String message) {
+        super(message);
+    }
 }

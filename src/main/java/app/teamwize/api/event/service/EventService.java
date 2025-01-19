@@ -99,7 +99,7 @@ public class EventService {
     }
 
     public Event getEvent(Long organizationId, Long id) throws EventNotFoundException {
-        var event = eventRepository.findByOrganizationIdAndId(organizationId, id).orElseThrow(() -> new EventNotFoundException(id));
+        var event = eventRepository.findByOrganizationIdAndId(organizationId, id).orElseThrow(() -> new EventNotFoundException("Event not found with Id: " + id));
         return eventMapper.toEvent(event);
     }
 

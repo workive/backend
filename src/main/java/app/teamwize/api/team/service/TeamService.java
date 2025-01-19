@@ -2,15 +2,15 @@ package app.teamwize.api.team.service;
 
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
 import app.teamwize.api.event.service.EventService;
-import app.teamwize.api.organization.service.OrganizationService;
-import app.teamwize.api.team.domain.event.TeamCreatedEvent;
-import app.teamwize.api.team.domain.event.TeamEventPayload;
-import app.teamwize.api.team.repository.TeamRepository;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
+import app.teamwize.api.organization.service.OrganizationService;
 import app.teamwize.api.team.domain.TeamStatus;
 import app.teamwize.api.team.domain.entity.Team;
+import app.teamwize.api.team.domain.event.TeamCreatedEvent;
+import app.teamwize.api.team.domain.event.TeamEventPayload;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
 import app.teamwize.api.team.domain.request.TeamCreateRequest;
+import app.teamwize.api.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -57,7 +57,7 @@ public class TeamService {
 
     public Team getTeam(Long organizationId, Long teamId) throws TeamNotFoundException {
         return teamRepository.findByOrganizationIdAndId(organizationId, teamId)
-                .orElseThrow(() -> new TeamNotFoundException(organizationId, teamId));
+                .orElseThrow(() -> new TeamNotFoundException("Team not found with Id: " + teamId));
     }
 
     @Transactional

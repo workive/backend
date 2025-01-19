@@ -24,7 +24,7 @@ public class LeaveTypeService {
 
     public LeaveType getLeaveType(Long organizationId, Long id) throws LeaveTypeNotFoundException {
         return leaveTypeRepository.findByOrganizationIdAndId(organizationId, id)
-                .orElseThrow(() -> new LeaveTypeNotFoundException(id));
+                .orElseThrow(() -> new LeaveTypeNotFoundException("Leave type not found with id: " + id));
     }
 
     @Transactional

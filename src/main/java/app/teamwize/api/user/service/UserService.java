@@ -2,6 +2,7 @@ package app.teamwize.api.user.service;
 
 import app.teamwize.api.assets.domain.exception.AssetNotFoundException;
 import app.teamwize.api.assets.service.AssetService;
+import app.teamwize.api.auth.domain.AuthUserDetails;
 import app.teamwize.api.auth.domain.event.OrganizationEventPayload;
 import app.teamwize.api.auth.domain.event.UserEventPayload;
 import app.teamwize.api.base.domain.model.request.PaginationRequest;
@@ -10,18 +11,17 @@ import app.teamwize.api.leave.exception.LeavePolicyNotFoundException;
 import app.teamwize.api.leave.service.LeavePolicyService;
 import app.teamwize.api.organization.exception.OrganizationNotFoundException;
 import app.teamwize.api.organization.service.OrganizationService;
-import app.teamwize.api.user.domain.event.UserInvitedEvent;
-import app.teamwize.api.user.exception.*;
-import app.teamwize.api.auth.domain.AuthUserDetails;
 import app.teamwize.api.team.domain.exception.TeamNotFoundException;
 import app.teamwize.api.team.service.TeamService;
 import app.teamwize.api.user.domain.UserRole;
 import app.teamwize.api.user.domain.UserStatus;
 import app.teamwize.api.user.domain.entity.User;
+import app.teamwize.api.user.domain.event.UserInvitedEvent;
 import app.teamwize.api.user.domain.request.AdminUserCreateRequest;
 import app.teamwize.api.user.domain.request.UserCreateRequest;
 import app.teamwize.api.user.domain.request.UserFilterRequest;
 import app.teamwize.api.user.domain.request.UserUpdateRequest;
+import app.teamwize.api.user.exception.*;
 import app.teamwize.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import static app.teamwize.api.user.repository.UserSpecifications.*;
 
@@ -51,7 +50,7 @@ public class UserService {
 
     public void checkIfUserExists(String email) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(email)) {
-            throw new UserAlreadyExistsException(email);
+            throw new UserAlreadyExistsException("User already exists with email: " + email);
         }
     }
 
@@ -102,9 +101,9 @@ public class UserService {
         var leavePolicy = leavePolicyService.getLeavePolicy(organizationId, request.leavePolicyId());
 
         checkIfUserExists(request.email());
-        var inviterUser = userRepository.findById(inviterUserId).orElseThrow(() -> new UserNotFoundException(organizationId, inviterUserId));
+        var inviterUser = userRepository.findById(inviterUserId).orElseThrow(() -> new UserNotFoundException("Inviter user not found, id: " + inviterUserId));
         if (inviterUser.getRole() != UserRole.ORGANIZATION_ADMIN) {
-            throw new PermissionDeniedException(organizationId);
+            throw new PermissionDeniedException("Only organization admin can create users");
         }
         var user = new User()
                 .setStatus(UserStatus.ENABLED)
@@ -158,7 +157,7 @@ public class UserService {
     public User changeUserStatus(long organizationId, long adminUserId, long targetUserId, UserStatus status)
             throws UnableToDisableCurrentUserException, UserNotFoundException {
         if (adminUserId == targetUserId) {
-            throw new UnableToDisableCurrentUserException(targetUserId);
+            throw new UnableToDisableCurrentUserException("Unable to disable current user");
         }
 
         var user = getById(organizationId, targetUserId);
@@ -186,12 +185,12 @@ public class UserService {
 
     private User getById(Long organizationId, Long userId) throws UserNotFoundException {
         return userRepository.findByOrganizationIdAndId(organizationId, userId)
-                .orElseThrow(() -> new UserNotFoundException(organizationId, userId));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
     }
 
     private void checkPasswordMatch(String rawPassword, String encodedPassword) throws IncorrectPasswordException {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new IncorrectPasswordException();
+            throw new IncorrectPasswordException("Password does not match");
         }
     }
 

@@ -1,9 +1,9 @@
 package app.teamwize.api.user.exception;
 
-import app.teamwize.api.base.exception.BaseException;
-import lombok.RequiredArgsConstructor;
+import app.teamwize.api.base.exception.UnprocessableEntityException;
 
-@RequiredArgsConstructor
-public class UnableToDisableCurrentUserException extends BaseException {
-    private final long targetUserId;
+public class UnableToDisableCurrentUserException extends UnprocessableEntityException {
+    public UnableToDisableCurrentUserException(String message) {
+        super(message);
+    }
 }
